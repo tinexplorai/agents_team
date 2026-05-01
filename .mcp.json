@@ -1,0 +1,41 @@
+{
+  "_comment": "MCP servers Claude Code loads at startup. Tokens are read from .env via ${VAR} expansion. Copy .env.example to .env and fill in real values. Do NOT commit .env.",
+
+  "mcpServers": {
+    "figma": {
+      "_comment": "Read-only Figma access for the Designer Agent. Get a personal access token at https://www.figma.com/developers/api#access-tokens",
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
+      }
+    },
+
+    "github": {
+      "_comment": "GitHub MCP for the DevOps Agent. Create a fine-scoped Personal Access Token at https://github.com/settings/tokens with 'repo' + 'workflow' scopes.",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+
+    "vercel": {
+      "_comment": "Vercel remote MCP for the DevOps Agent. Replace <team-slug>/<project-slug> in the URL with your actual values. Create a Vercel access token at https://vercel.com/account/tokens",
+      "type": "http",
+      "url": "https://mcp.vercel.com/<team-slug>/<project-slug>",
+      "headers": {
+        "Authorization": "Bearer ${VERCEL_TOKEN}"
+      }
+    },
+
+    "supabase": {
+      "_comment": "Supabase MCP — used by Architect (schema design) and DEV (migrations) when project uses Supabase. Optional; leave SUPABASE_ACCESS_TOKEN blank to disable. Get a personal access token at https://supabase.com/dashboard/account/tokens",
+      "command": "npx",
+      "args": ["-y", "@supabase/mcp-server-supabase@latest"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "${SUPABASE_ACCESS_TOKEN}"
+      }
+    }
+  }
+}
