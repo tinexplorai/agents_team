@@ -1,10 +1,10 @@
 CHANGE REQUEST — re-run a subset of the agent team after QA / deploy.
 
-I want to change something the team has already finished. Handle this per .agent_team/project_description.md §4 step 9 (Change Request loop).
+I want to change something the team has already finished. Handle this per _input/1_project_description.md §4 step 9 (Change Request loop).
 
 Process:
 1. Ground yourself. Read in this order:
-   - .agent_team/project_description.md (§4 step 9 — the rules for this loop)
+   - _input/1_project_description.md (§4 step 9 — the rules for this loop)
    - .agent_team/task_board.md (current state — what phase the team last completed)
    - docs/user_stories.md, docs/design_spec.md, docs/api_contract.md (existing agreements you must not silently break)
    - docs/qa_report.md (last QA pass — this is the regression baseline)

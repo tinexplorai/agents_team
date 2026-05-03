@@ -1,12 +1,12 @@
 # Project Resources
 
-> **Concrete values agents look up at build time.** Copy this file to `resources.md` (gitignored) and fill in the values for your project.
+> **Concrete values agents look up at build time.** Copy this file to `2_resources.md` (gitignored) and fill in the values for your project.
 >
 > **Lookup protocol** *(every agent must follow this — Team Lead enforces):*
-> 1. Before asking the user for any concrete identifier (URL, slug, ID, path, project ref), READ `.agent_team/resources.md` first.
+> 1. Before asking the user for any concrete identifier (URL, slug, ID, path, project ref), READ `_input/2_resources.md` first.
 > 2. If the value is filled (not `[PLACEHOLDER]` and not `N/A`), use it as-is.
 > 3. If the value is `[PLACEHOLDER]` or missing, ask the user in chat.
-> 4. After the user answers, **write the value back into `resources.md`** under the matching key, so the next agent doesn't ask again.
+> 4. After the user answers, **write the value back into `_input/2_resources.md`** under the matching key, so the next agent doesn't ask again.
 > 5. If the value is `N/A` (user explicitly deferred), do NOT ask the user again. Make a reasonable default decision yourself, document it in your deliverable (e.g. `docs/api_contract.md`, `docs/deployment.md`), and flag it via `task_board.md`.
 >
 > **Secrets** (tokens, API keys, passwords) live in `.env` (gitignored, copy from `.env.example`) — NEVER here. This file holds non-secret identifiers, slugs, paths, and references only.
@@ -54,5 +54,5 @@
 
 ## Design
 
-- **design_input_folder:** `docs/design_input/` *(default — drop PDFs / PNG / JPG here)*
-- **figma_file_url:** `[https://www.figma.com/file/<KEY>/<NAME>]` *(optional — Designer Agent uses it as fallback if `design_input/` is empty)*
+- **design_input_folder:** `_input/4_design_input/` *(default — drop PDFs / PNG / JPG here)*
+- **figma_file_url:** `[https://www.figma.com/file/<KEY>/<NAME>]` *(optional — Designer Agent uses it as fallback if `_input/4_design_input/` is empty)*

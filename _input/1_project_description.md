@@ -1,12 +1,12 @@
 # Project Description
 
 > **Single source of truth for the agent team kickoff.**
-> Fill in every `[...]` placeholder below, then start Claude Code and use the short kickoff prompt in [README §3, Step 5](../README.md#step-5-kick-off-the-agent-team). If your idea is still rough, [Step 4](../README.md#step-4-optional-scope-the-project-with-po--architect) lets PO + Architect help flesh it out first.
+> Fill in every `[...]` placeholder below, then start Claude Code and use the short kickoff prompt in [`prompts/2_kickoff.md`](prompts/2_kickoff.md). If your idea is still rough, [`prompts/1_scope.md`](prompts/1_scope.md) lets PO + Architect help flesh it out first. See [`README.md`](README.md) for the full step-by-step.
 >
 > The Team Lead and every sub-agent will read this file at the start of the project.
 >
-> **Model assignments live in [agents_config.md](agents_config.md)** — edit that file to change which model each agent uses.
-> **Per-agent instructions live in [agents/](agents/)** — edit those files to change agent behavior.
+> **Model assignments live in [`../.agent_team/agents_config.md`](../.agent_team/agents_config.md)** — edit that file to change which model each agent uses.
+> **Per-agent instructions live in [`../.agent_team/agents/`](../.agent_team/agents/)** — edit those files to change agent behavior.
 
 ---
 
@@ -58,24 +58,24 @@
 The team and per-agent instructions:
 
 - **Team Lead / Orchestrator** — coordinates progress via the shared task board (your main Claude Code session).
-- **PO Agent** — see [agents/PO_agent.md](agents/PO_agent.md).
-- **Architect Agent** — see [agents/Architect_agent.md](agents/Architect_agent.md).
-- **Designer Agent** — see [agents/Designer_agent.md](agents/Designer_agent.md). *(skip for backend-only projects)*
-- **DEV Agent** — see [agents/DEV_agent.md](agents/DEV_agent.md). *(skip if mobile-only — Flutter Agent covers it)*
-- **Flutter Agent** — see [agents/Flutter_agent.md](agents/Flutter_agent.md). *(only when project targets mobile — see §2 Tech Stack)*
-- **QA Agent** — see [agents/QA_agent.md](agents/QA_agent.md).
-- **DevOps Agent** — see [agents/DevOps_agent.md](agents/DevOps_agent.md).
+- **PO Agent** — see [`../.agent_team/agents/PO_agent.md`](../.agent_team/agents/PO_agent.md).
+- **Architect Agent** — see [`../.agent_team/agents/Architect_agent.md`](../.agent_team/agents/Architect_agent.md).
+- **Designer Agent** — see [`../.agent_team/agents/Designer_agent.md`](../.agent_team/agents/Designer_agent.md). *(skip for backend-only projects)*
+- **DEV Agent** — see [`../.agent_team/agents/DEV_agent.md`](../.agent_team/agents/DEV_agent.md). *(skip if mobile-only — Flutter Agent covers it)*
+- **Flutter Agent** — see [`../.agent_team/agents/Flutter_agent.md`](../.agent_team/agents/Flutter_agent.md). *(only when project targets mobile — see §2 Tech Stack)*
+- **QA Agent** — see [`../.agent_team/agents/QA_agent.md`](../.agent_team/agents/QA_agent.md).
+- **DevOps Agent** — see [`../.agent_team/agents/DevOps_agent.md`](../.agent_team/agents/DevOps_agent.md).
 
-Models for each agent are defined in [agents_config.md](agents_config.md).
+Models for each agent are defined in [`../.agent_team/agents_config.md`](../.agent_team/agents_config.md).
 
-> Add or remove agents to fit the project. See [README §6](../README.md#6-scaling--adding-agents) for the catalog of agent types and recommended models.
+> Add or remove agents to fit the project. See [`../README.md` §6](../README.md#6-scaling--adding-agents) for the catalog of agent types and recommended models.
 
 ---
 
 ## 4. Process
 
 1. Create `.agent_team/task_board.md` (read this file for project context).
-2. **PO Agent** → write `docs/user_stories.md` (reads `docs/po_input/` + `project_description.md`).
+2. **PO Agent** → write `docs/user_stories.md` (reads `_input/3_po_input/` + `_input/1_project_description.md`).
 3. **Architect Agent** + **Designer Agent** *(in parallel)* → `docs/api_contract.md` (+ `docs/tech_design.md` if non-trivial) and `docs/design_spec.md`. *(Skip Designer for backend-only projects.)*
 4. **Implementation phase** — picks one of these paths based on Tech Stack (§2):
    - **Web only:** **DEV Agent** → backend + web frontend + unit tests + E2E tests.
@@ -85,7 +85,7 @@ Models for each agent are defined in [agents_config.md](agents_config.md).
 6. **Team Lead — INTERIM report + deployment gate.** Compile a report covering everything done locally so far (what was built, QA results, known issues), write it to `docs/interim_report.md`, then **stop and ask the user**: *"Ready to push to GitHub and deploy via DevOps Agent? Or stop here / fix something first?"* **Do not spawn DevOps without explicit user approval.**
 7. **DevOps Agent** *(only if user approves at step 6)* → push to GitHub, set up CI; deploy to Vercel for web and/or set up GitHub Actions macOS runner + TestFlight/Play Console pipeline for mobile. Write `docs/deployment.md`.
 8. **Team Lead — FINAL report.** After DevOps finishes, compile a final report at `docs/final_report.md` covering everything from the interim report **plus** deployment URLs, CI status, GitHub Secrets the user must add manually, and any first-deploy follow-ups (custom domain, store review, etc.).
-9. **Change Request loop** *(any time after QA — design tweak, new requirement, bug found post-deploy)*. The kickoff prompt for this lives in [`../3. PROMPT_CHANGE_REQUEST.md`](../3.%20PROMPT_CHANGE_REQUEST.md). Team Lead classifies the change and re-runs the **minimum** set of agents — do not re-run the whole pipeline:
+9. **Change Request loop** *(any time after QA — design tweak, new requirement, bug found post-deploy)*. The kickoff prompt for this lives in [`prompts/3_change_request.md`](prompts/3_change_request.md). Team Lead classifies the change and re-runs the **minimum** set of agents — do not re-run the whole pipeline:
    - **Small** (copy, color, spacing, single-component bugfix) → **DEV Agent** → **QA Agent** (regression on affected flows). Skip PO / Architect / Designer.
    - **Medium** (layout change, new component, design tokens) → **Designer Agent** → **DEV / Flutter Agent** → **QA Agent**. Skip PO / Architect.
    - **Large — backend/API** (new endpoint, schema change, business logic) → **PO Agent** (append story) → **Architect Agent** (update contract) → **DEV / Flutter Agent** → **QA Agent**. Skip Designer.
@@ -104,15 +104,15 @@ Agents communicate via `task_board.md` — never via chat. Each agent updates th
 
 ## 5. External resources
 
-Concrete identifiers (URLs, slugs, project refs, bundle IDs, paths) live in **[`resources.md`](resources.md)** — a separate file gitignored by default. Copy [`resources.example.md`](resources.example.md) → `resources.md` and fill it in once for the project. Agents read it before asking you for any value.
+Concrete identifiers (URLs, slugs, project refs, bundle IDs, paths) live in **[`2_resources.md`](2_resources.md)** — a separate file gitignored by default. Copy [`2_resources.example.md`](2_resources.example.md) → `2_resources.md` and fill it in once for the project. Agents read it before asking you for any value.
 
-Secrets (tokens, API keys) live in `.env` (gitignored, copy from [`../.env.example`](../.env.example)). See [README §1.4](../README.md#14-mcp-configuration) for setup.
+Secrets (tokens, API keys) live in `.env` (gitignored, copy from [`../.env.example`](../.env.example)). See [`../README.md` §1.4](../README.md#14-mcp-configuration) for setup.
 
-Mobile signing keys go in **GitHub Secrets**, not `.env` or `resources.md`. DevOps Agent will list the exact names in `docs/deployment.md`.
+Mobile signing keys go in **GitHub Secrets**, not `.env` or `2_resources.md`. DevOps Agent will list the exact names in `docs/deployment.md`.
 
 ## 5.1 How to handle missing values
 
-When filling in `project_description.md` or `resources.md`, you have three options for any field:
+When filling in `1_project_description.md` or `2_resources.md`, you have three options for any field:
 
 | Marker | Meaning | What agents do |
 |--------|---------|----------------|

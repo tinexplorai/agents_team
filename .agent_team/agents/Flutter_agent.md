@@ -17,8 +17,8 @@ Build the mobile app in Flutter. Cover Android (APK/AAB) and iOS (IPA) targets w
 - `docs/api_contract.md` — exact API specs, binding (from Architect Agent).
 - `docs/design_spec.md` — UI specifications including mobile-specific notes (from Designer Agent).
 - `docs/tech_design.md` — data model + cross-cutting decisions, if Architect wrote one.
-- `.agent_team/project_description.md` — confirms mobile is in scope, target platforms, minimum OS versions.
-- `.agent_team/resources.md` — `bundle_id`, `android_package`, Supabase identifiers (if used). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime Supabase keys live in `.env` — wire your code to read from there.
+- `_input/1_project_description.md` — confirms mobile is in scope, target platforms, minimum OS versions.
+- `_input/2_resources.md` — `bundle_id`, `android_package`, Supabase identifiers (if used). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime Supabase keys live in `.env` — wire your code to read from there.
 - `backend/` — if a DEV Agent has already produced backend code, mirror its API client patterns.
 
 ## Deliverables
@@ -60,7 +60,7 @@ mobile/
 - Follow the API contract EXACTLY. If the DEV Agent has shipped a working backend, point the API client at it (read `backend/` for the local URL or env var).
 - Implement every screen listed in `design_spec.md`. Use the design tokens (colors, typography, spacing) literally — no creative re-interpretation.
 - Honor mobile-platform conventions called out in `design_spec.md`: minimum touch target 44pt, safe areas (notch / home indicator on iOS, status bar on Android), platform-appropriate navigation patterns.
-- Pick **one** state management approach per project and use it consistently. Default to Riverpod unless `project_description.md` specifies otherwise.
+- Pick **one** state management approach per project and use it consistently. Default to Riverpod unless `_input/1_project_description.md` specifies otherwise.
 - Write at least one widget test per screen and at least one integration test for the primary user flow. QA Agent extends from there.
 - Keep `pubspec.yaml` minimal — pin versions, no unused dependencies.
 

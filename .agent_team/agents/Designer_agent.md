@@ -2,7 +2,7 @@
 
 > **Model:** see [../agents_config.md](../agents_config.md) (do not hardcode).
 > **Spawned by:** Team Lead at Phase 2, **in parallel with the Architect Agent**.
-> **Design input:** primary source is `docs/design_input/` (user-provided PDFs / images). Falls back to the **Figma MCP server** if that folder is empty (configured in [`../../.mcp.json`](../../.mcp.json)).
+> **Design input:** primary source is `_input/4_design_input/` (user-provided PDFs / images). Falls back to the **Figma MCP server** if that folder is empty (configured in [`../../.mcp.json`](../../.mcp.json)).
 
 ## Role
 
@@ -16,14 +16,14 @@ Skip this agent entirely for backend-only projects.
 
 Resolve design source in this order (use whichever is available, do not require all three):
 
-1. **`docs/design_input/`** *(primary)* — user-provided PDFs and images exported from any design tool. Read every file in the folder. See [`docs/design_input/README.md`](../../docs/design_input/README.md) for the supported format list.
-2. **Figma file** *(fallback)* — via the `figma` MCP server. URL/key is in `project_description.md` §5.
+1. **`_input/4_design_input/`** *(primary)* — user-provided PDFs and images exported from any design tool. Read every file in the folder. See [`_input/4_design_input/README.md`](../../_input/4_design_input/README.md) for the supported format list.
+2. **Figma file** *(fallback)* — via the `figma` MCP server. URL/key is in `_input/1_project_description.md` §5.
 3. **User stories alone** *(last resort)* — if neither of the above is available, write a best-effort spec from `docs/user_stories.md` and add a `## Assumptions` section at the top.
 
 Always also read:
 - `docs/user_stories.md` — user-facing behaviors to design for (from PO Agent).
-- `.agent_team/project_description.md` — tech stack, frontend framework, brand constraints.
-- `.agent_team/resources.md` — `design_input_folder` path and `figma_file_url`. Read this before asking the user; follow the lookup protocol at the top of that file. If both are `N/A`, write a best-effort spec from user stories and add a `## Assumptions` section.
+- `_input/1_project_description.md` — tech stack, frontend framework, brand constraints.
+- `_input/2_resources.md` — `design_input_folder` path and `figma_file_url`. Read this before asking the user; follow the lookup protocol at the top of that file. If both are `N/A`, write a best-effort spec from user stories and add a `## Assumptions` section.
 
 ## Deliverables
 
@@ -34,7 +34,7 @@ Per screen / page, document:
 ```
 ## Screen: {Name}
 **Maps to:** US-{N} (which user stories this screen covers)
-**Source:** {file path in design_input/ OR Figma frame URL OR "inferred from user stories"}
+**Source:** {file path in _input/4_design_input/ OR Figma frame URL OR "inferred from user stories"}
 
 ### Layout
 - {Grid / spacing / breakpoints}
@@ -51,7 +51,7 @@ Per screen / page, document:
 ### Accessibility
 - {Color contrast, keyboard nav, ARIA labels, alt text}
 
-### Mobile considerations *(include only when project targets Flutter / iOS / Android — see project_description.md tech stack)*
+### Mobile considerations *(include only when project targets Flutter / iOS / Android — see _input/1_project_description.md tech stack)*
 - {Touch target minimum: 44pt iOS / 48dp Android}
 - {Safe areas: top notch / status bar, bottom home indicator / nav bar}
 - {Platform navigation: iOS back-swipe + Cupertino patterns vs. Android system back + Material patterns — flag where they diverge}
@@ -72,7 +72,7 @@ Also include a top-level section:
 
 ### 2. (Optional) Save reference images
 
-If the Figma MCP returns image exports, save them to `docs/design_assets/` and reference them in `design_spec.md`. Do **not** copy files from `docs/design_input/` into `docs/design_assets/` — those stay in their original folder, just reference them by relative path.
+If the Figma MCP returns image exports, save them to `docs/design_assets/` and reference them in `design_spec.md`. Do **not** copy files from `_input/4_design_input/` into `docs/design_assets/` — those stay in their original folder, just reference them by relative path.
 
 ### 3. Update `.agent_team/task_board.md`
 
@@ -84,5 +84,5 @@ If the Figma MCP returns image exports, save them to `docs/design_assets/` and r
 - Be explicit, not directional. "Padding 16px" beats "comfortable spacing." DEV should not need to guess.
 - Cover empty / loading / error states — they're easy to forget but always needed.
 - If the input source is missing, malformed, or not provided, fall back per the Inputs priority above and note `## Assumptions` at the top so DEV knows what's inferred vs. designed.
-- For PPT/PPTX in `design_input/`: do not try to parse — note in the spec that the user needs to re-export as PDF, then proceed with whatever else is available.
+- For PPT/PPTX in `_input/4_design_input/`: do not try to parse — note in the spec that the user needs to re-export as PDF, then proceed with whatever else is available.
 - Do not write production CSS or component code (DEV's job). Use design language (tokens, layout descriptions, image refs).
