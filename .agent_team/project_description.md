@@ -85,39 +85,42 @@ Models for each agent are defined in [agents_config.md](agents_config.md).
 6. **Team Lead — INTERIM report + deployment gate.** Compile a report covering everything done locally so far (what was built, QA results, known issues), write it to `docs/interim_report.md`, then **stop and ask the user**: *"Ready to push to GitHub and deploy via DevOps Agent? Or stop here / fix something first?"* **Do not spawn DevOps without explicit user approval.**
 7. **DevOps Agent** *(only if user approves at step 6)* → push to GitHub, set up CI; deploy to Vercel for web and/or set up GitHub Actions macOS runner + TestFlight/Play Console pipeline for mobile. Write `docs/deployment.md`.
 8. **Team Lead — FINAL report.** After DevOps finishes, compile a final report at `docs/final_report.md` covering everything from the interim report **plus** deployment URLs, CI status, GitHub Secrets the user must add manually, and any first-deploy follow-ups (custom domain, store review, etc.).
+9. **Change Request loop** *(any time after QA — design tweak, new requirement, bug found post-deploy)*. The kickoff prompt for this lives in [`../3. PROMPT_CHANGE_REQUEST.md`](../3.%20PROMPT_CHANGE_REQUEST.md). Team Lead classifies the change and re-runs the **minimum** set of agents — do not re-run the whole pipeline:
+   - **Small** (copy, color, spacing, single-component bugfix) → **DEV Agent** → **QA Agent** (regression on affected flows). Skip PO / Architect / Designer.
+   - **Medium** (layout change, new component, design tokens) → **Designer Agent** → **DEV / Flutter Agent** → **QA Agent**. Skip PO / Architect.
+   - **Large — backend/API** (new endpoint, schema change, business logic) → **PO Agent** (append story) → **Architect Agent** (update contract) → **DEV / Flutter Agent** → **QA Agent**. Skip Designer.
+   - **Large — UX/flow** (new screens, changed user journey) → full re-run **PO → Architect → Designer → DEV / Flutter → QA** (treat as v2).
+
+   Rules for the loop:
+   - **Append, don't rewrite** — add new sections to `docs/user_stories.md`, `docs/design_spec.md`, `docs/api_contract.md` rather than overwriting, so history is preserved.
+   - **Regression scope** — QA must test all flows that share code with the changed component, not only the new behavior.
+   - **Task board** — open a new section `## Phase 9 — Change Request: <short title>` in `task_board.md`; agents pass the baton through it as in normal phases.
+   - **Change report** — Team Lead writes `docs/change_report_<short-title>.md` after QA passes (what changed, agents run, QA results, files touched).
+   - **Redeploy gate** — if `docs/deployment.md` exists (project already shipped), STOP after QA and ask the user before spawning DevOps Agent for redeploy (same human gate as step 6).
 
 Agents communicate via `task_board.md` — never via chat. Each agent updates the task board's messages table when completing its phase.
 
 ---
 
-## 5. External resources (for MCP-using agents)
+## 5. External resources
 
-The Designer, DevOps, and DB-using agents need these references. Fill in only what applies — leave blank to skip.
+Concrete identifiers (URLs, slugs, project refs, bundle IDs, paths) live in **[`resources.md`](resources.md)** — a separate file gitignored by default. Copy [`resources.example.md`](resources.example.md) → `resources.md` and fill it in once for the project. Agents read it before asking you for any value.
 
-**Design (Designer Agent):**
-- **Design input folder:** drop PDFs / PNG / JPG into `docs/design_input/` (preferred). See `docs/design_input/README.md`.
-- **Figma file** *(optional fallback)*: `[https://www.figma.com/file/<KEY>/<NAME>]`
+Secrets (tokens, API keys) live in `.env` (gitignored, copy from [`../.env.example`](../.env.example)). See [README §1.4](../README.md#14-mcp-configuration) for setup.
 
-**Database (Architect + DEV agents — only if using Supabase):**
-- **Supabase project ref:** `[<project-ref>]` *(found in Supabase dashboard URL)*
-- **Supabase project URL:** `[https://<project-ref>.supabase.co]`
+Mobile signing keys go in **GitHub Secrets**, not `.env` or `resources.md`. DevOps Agent will list the exact names in `docs/deployment.md`.
 
-**Source control + Web deploy (DevOps Agent):**
-- **GitHub repo:** `[https://github.com/<owner>/<repo>]`
-- **Default branch:** `[main]`
-- **Vercel team slug:** `[<team-slug>]` *(if web=yes)*
-- **Vercel project slug:** `[<project-slug>]` *(if web=yes)*
-- **Vercel env vars to set:** `[e.g. DATABASE_URL, JWT_SECRET — names only; provide values in chat]`
+## 5.1 How to handle missing values
 
-**Mobile distribution (DevOps Agent — only if mobile=yes):**
-- **Bundle ID:** `[com.example.myapp]`
-- **Apple Developer Team ID:** `[<team-id>]` *(if iOS=yes)*
-- **iOS distribution channel:** `[TestFlight / App Store]`
-- **Google Play package name:** `[com.example.myapp]` *(if Android=yes)*
-- **Android distribution channel:** `[Play Console internal track / Firebase App Distribution / Play Store]`
-- **GitHub Secrets to add manually** *(DevOps will list these in `docs/deployment.md`)* — signing certs, App Store Connect API key, Play service account JSON, etc.
+When filling in `project_description.md` or `resources.md`, you have three options for any field:
 
-> Tokens for MCP servers live in `.env` (copy from `.env.example`). See [README §1.4](../README.md#14-mcp-configuration). Mobile signing keys go in **GitHub Secrets**, not `.env`.
+| Marker | Meaning | What agents do |
+|--------|---------|----------------|
+| **A real value** | You know what you want | Use it as-is. |
+| **`[PLACEHOLDER]`** *(square brackets, default in template)* | Not filled in yet | Ask you in chat, then write the answer back to the file. |
+| **`N/A`** | You explicitly defer the decision | Do NOT ask you again. The responsible agent (PO / Architect / Designer / DEV / Flutter / DevOps) makes a reasonable default decision, documents it in their deliverable, and flags it in `task_board.md`. Team Lead surfaces all `N/A`-derived decisions in the interim/final report so you can override later. |
+
+Use `N/A` when you trust the relevant agent's judgment more than your own (e.g. you know nothing about state management → write `state_management: N/A` and let Flutter Agent pick).
 
 ---
 

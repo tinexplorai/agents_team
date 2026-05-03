@@ -16,6 +16,7 @@ Write clean, production-quality code. Include unit tests and E2E tests.
 - `docs/api_contract.md` — exact endpoint specs from Architect Agent (paths, status codes, response shapes are binding).
 - `docs/tech_design.md` — data model + cross-cutting decisions, if Architect wrote one.
 - `.agent_team/project_description.md` — tech stack, constraints.
+- `.agent_team/resources.md` — concrete identifiers (Supabase `project_ref`/`project_url`, runtime env var names). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime keys (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) live in `.env` — wire your code to read from there.
 
 ## Deliverables
 

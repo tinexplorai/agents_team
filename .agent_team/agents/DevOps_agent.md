@@ -18,27 +18,28 @@ Look at the project structure to decide what you're shipping:
 - **Mobile only (`mobile/`)** → push to GitHub + set up CI builds for APK/IPA + distribute to TestFlight / Play Console internal track. **No Vercel.**
 - **Both** → push to GitHub once + Vercel for web + mobile CI workflow for the app.
 
-## Required from the user (ask if missing — do not proceed without)
+## Required values (look up before asking)
+
+All concrete identifiers below should already be in `.agent_team/resources.md`. **Follow the lookup protocol at the top of that file:** read first, only ask the user if a value is `[PLACEHOLDER]` or missing, write the answer back to `resources.md` after the user provides it. If a value is `N/A`, decide reasonably and document the choice in `docs/deployment.md`.
 
 **Always:**
-- **GitHub repo URL** (e.g. `https://github.com/{owner}/{repo}`).
-- **Default branch name** (usually `main`).
+- `github_repo_url`, `default_branch`.
 
 **For web deploys:**
-- **Vercel team slug + project slug.**
-- **Vercel env vars** the app needs (e.g. `DATABASE_URL`, `JWT_SECRET`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`).
+- `vercel_team_slug`, `vercel_project_slug`, `vercel_env_var_names`.
+- The values for those env vars come from `.env` (e.g. `SUPABASE_URL`, `SUPABASE_ANON_KEY`). Read them from there at deploy time — do not hardcode.
 
 **For mobile deploys:**
-- **Bundle identifier** (e.g. `com.example.myapp`).
-- **Apple Developer Team ID** + signing certificate / provisioning profile (Apple Developer Program membership required, $99/yr) — the user must add these as **GitHub Secrets**, you do not handle keys directly.
-- **Google Play service account JSON** — same, GitHub Secret.
-- **Distribution target:** TestFlight (iOS internal) / Play Console internal track / Firebase App Distribution / public store release.
+- `bundle_id`, `apple_team_id`, `ios_distribution_channel`, `android_package`, `android_distribution_channel`.
+- Signing material (iOS .p12 + provisioning profile, App Store Connect API key, Android keystore, Play service account JSON) — these go in **GitHub Secrets**, NOT `.env` and NOT `resources.md`. List the exact secret names in `docs/deployment.md` and instruct the user to add them via repo Settings → Secrets and variables → Actions.
 
 ## Inputs
 
 - `backend/`, `frontend/`, `mobile/` — whichever exist.
 - `docs/qa_report.md` — must read **PASS** or **PASS WITH NOTES**. If **FAIL**, do not deploy; flag back to Team Lead.
 - `.agent_team/project_description.md` — tech stack (informs CI matrix, Vercel preset, mobile platforms).
+- `.agent_team/resources.md` — every identifier listed in "Required values" above.
+- `.env` — reference for runtime env var values to wire into Vercel.
 
 ## Tasks
 

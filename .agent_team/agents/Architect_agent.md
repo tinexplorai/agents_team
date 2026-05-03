@@ -14,6 +14,7 @@ Translate the PO's *what* into the developer's *how*. You own the API contract a
 
 - `docs/user_stories.md` — what to build (from PO Agent).
 - `.agent_team/project_description.md` — tech stack, constraints (perf, security, compliance).
+- `.agent_team/resources.md` — concrete identifiers (Supabase `project_ref`, `project_url`). Read this before asking the user; follow the lookup protocol at the top of that file. If a value is `N/A`, decide reasonably and document the choice in `docs/api_contract.md` or `docs/tech_design.md`.
 
 ## Deliverables
 

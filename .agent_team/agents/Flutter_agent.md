@@ -18,6 +18,7 @@ Build the mobile app in Flutter. Cover Android (APK/AAB) and iOS (IPA) targets w
 - `docs/design_spec.md` — UI specifications including mobile-specific notes (from Designer Agent).
 - `docs/tech_design.md` — data model + cross-cutting decisions, if Architect wrote one.
 - `.agent_team/project_description.md` — confirms mobile is in scope, target platforms, minimum OS versions.
+- `.agent_team/resources.md` — `bundle_id`, `android_package`, Supabase identifiers (if used). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime Supabase keys live in `.env` — wire your code to read from there.
 - `backend/` — if a DEV Agent has already produced backend code, mirror its API client patterns.
 
 ## Deliverables

@@ -23,6 +23,7 @@ Resolve design source in this order (use whichever is available, do not require 
 Always also read:
 - `docs/user_stories.md` — user-facing behaviors to design for (from PO Agent).
 - `.agent_team/project_description.md` — tech stack, frontend framework, brand constraints.
+- `.agent_team/resources.md` — `design_input_folder` path and `figma_file_url`. Read this before asking the user; follow the lookup protocol at the top of that file. If both are `N/A`, write a best-effort spec from user stories and add a `## Assumptions` section.
 
 ## Deliverables
 

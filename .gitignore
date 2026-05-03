@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Project resources (real values — copy from resources.example.md)
+.agent_team/resources.md
+
 # Node / JavaScript
 node_modules/
 dist/

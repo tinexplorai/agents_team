@@ -107,13 +107,22 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
 3. **Configure secrets:**
    ```bash
    cp .env.example .env
-   # then edit .env and paste in the three tokens
+   # then edit .env and paste in tokens + Supabase runtime keys (URL, anon key, service role key)
    ```
-4. **Update [`.mcp.json`](.mcp.json)** — replace `<team-slug>/<project-slug>` in the `vercel` server URL with your actual Vercel team and project slugs.
-5. **Fill in [project_description.md §5](.agent_team/project_description.md)** — Figma URL, GitHub repo URL, default branch, Vercel slugs. Agents read this to know which resources to use.
+4. **Configure resources:**
+   ```bash
+   cp .agent_team/resources.example.md .agent_team/resources.md
+   # then edit resources.md and fill in non-secret identifiers (project_ref, GitHub repo URL, Vercel slugs, bundle ID, etc.)
+   ```
+5. **Update [`.mcp.json`](.mcp.json)** — replace `<team-slug>/<project-slug>` in the `vercel` server URL with your actual Vercel team and project slugs.
 6. **Restart Claude Code** — `.mcp.json` is loaded at startup, so the servers won't be available until you restart.
 
-> `.env` is gitignored. Never commit it. The `.env.example` file is safe to commit.
+> `.env` and `.agent_team/resources.md` are both gitignored. Never commit them. The `.example` files are safe to commit.
+>
+> **Three-file split:**
+> - **`.env`** — secrets only (tokens, API keys, runtime keys like `SUPABASE_ANON_KEY`).
+> - **`.agent_team/resources.md`** — non-secret identifiers (URLs, slugs, project refs, bundle IDs, paths). Agents look up values here before asking you.
+> - **`.agent_team/project_description.md`** — project spec (goals, tech stack, agent list, process). Stable after kickoff.
 >
 > **Skip what you don't need:**
 > - Backend-only project → leave `FIGMA_API_KEY` blank and skip the Designer Agent.
@@ -190,7 +199,20 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
                     ┌──────────▼──────────┐
                     │  Team Lead          │  Phase 8
                     │  → FINAL report     │
-                    └─────────────────────┘
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────────────┐
+                    │  Phase 9 — Change Request   │  ◄── any time after QA
+                    │  (loop, on user request)    │      see 3. PROMPT_CHANGE_REQUEST.md
+                    │  Team Lead classifies:      │
+                    │   Small  → DEV → QA         │
+                    │   Medium → Designer → DEV   │
+                    │            → QA             │
+                    │   Large-API → PO → Arch     │
+                    │            → DEV → QA       │
+                    │   Large-UX → full re-run    │
+                    │  HUMAN GATE before redeploy │
+                    └─────────────────────────────┘
 
   * supabase MCP only when project uses Supabase
 ```
@@ -234,6 +256,13 @@ Team Lead ──→ User (HUMAN GATE):     "Interim report ready —     (Phase 
 Team Lead ──→ DevOps Agent:          "Approved — go ship"        (Phase 6)
 DevOps    ──→ Team Lead:             "Shipped — see deployment"  (Phase 7 done)
 Team Lead ──→ User:                   Final summary               (Phase 8)
+   ↓ user later requests a change (paste 3. PROMPT_CHANGE_REQUEST.md)
+Team Lead ──→ User:                  "Classified as <S/M/L>,        (Phase 9)
+                                       plan: <agents>. Approve?"
+   ↓ user approves
+Team Lead ──→ <subset of agents>:    Re-run minimum set; QA regress
+QA Agent  ──→ Team Lead:             "Regression passed"
+Team Lead ──→ User (HUMAN GATE):     "Redeploy? (only if shipped)"
 
 * Phase 3a/3b only when project has both web + mobile. Web-only skips Flutter; mobile-only skips DEV.
 ```
@@ -254,7 +283,8 @@ cd /path/to/my-new-project/
 
 You only **must** edit one file:
 
-- **[.agent_team/project_description.md](.agent_team/project_description.md)** — replace every `[...]` placeholder (overview, tech stack, constraints). This is the single source of truth the agent team reads at kickoff.
+- **[.agent_team/project_description.md](.agent_team/project_description.md)** — replace every `[...]` placeholder (overview, tech stack, constraints). This is the project spec the agent team reads at kickoff.
+- **[.agent_team/resources.md](.agent_team/resources.example.md)** — copy from `resources.example.md` and fill in concrete identifiers (URLs, slugs, project refs). Agents look up values here before asking you. Use `N/A` to defer the decision to the responsible agent (see project_description.md §5.1).
 
 Optional, only if you want to customize:
 
@@ -300,7 +330,9 @@ Process:
 
     Architect Agent: propose concrete values for §2 Tech Stack (web
     yes/no, mobile yes/no, backend, frontend, database) and a skeleton
-    for §5 External resources and §6 Constraints. List 3–5 clarifying
+    for §6 Constraints. For concrete identifiers (URLs, slugs, refs),
+    note them in resources.md (do NOT touch the file yet — just list
+    what the user will need to provide there). List 3–5 clarifying
     questions about scale, deployment target, security, compliance.
 
     Both: report back to Team Lead in chat. Be concrete (real values,
@@ -342,7 +374,9 @@ Read .agent_team/project_description.md and build the agent team described there
 
 - Read .agent_team/agents_config.md to get the model for each agent — pass that exact model when spawning.
 - For each agent, read its instruction file in .agent_team/agents/ (e.g. agents/PO_agent.md) and use it as the agent's system prompt.
-- Before spawning Designer or DevOps agents: verify the MCP servers they need are available and the resources in project_description.md §5 (Figma URL, GitHub repo, Vercel slugs) are filled in. If not, skip that agent and note it in the report.
+- Read .agent_team/resources.md (concrete identifiers — URLs, slugs, project refs). If the file does not exist, copy resources.example.md to resources.md and tell the user once. Pass `.agent_team/resources.md` to every agent that needs it (Architect, Designer, DEV, Flutter, DevOps) so they follow the lookup protocol at the top of that file.
+- Enforce the N/A rule from project_description.md §5.1: if a value is `N/A`, the responsible agent decides without re-asking the user, documents the decision in their deliverable, and flags it in task_board.md. Surface every N/A-derived decision in the interim/final report.
+- Before spawning Designer or DevOps agents: verify the MCP servers they need are available. If a value in resources.md is still `[PLACEHOLDER]`, ask the user once and write the answer back to resources.md.
 - Follow the Process section of project_description.md in order.
 - Create .agent_team/task_board.md as the shared coordination file; agents communicate only through that file.
 - Each agent must update the task board's messages table when its phase completes.
@@ -366,6 +400,19 @@ You can intervene at any time during execution:
 | Request a fix | `"QA found a bug, have DEV fix it"` |
 | Add a new agent | `"Spawn a Security Agent to do an OWASP review"` |
 | See reports | `"Summarize the QA report"` |
+
+### Step 7: Request a change after QA / deploy
+
+When QA has finished (or the project is already deployed) and you want to change something — design tweak, new feature, bug found in production — paste the contents of [`3. PROMPT_CHANGE_REQUEST.md`](3.%20PROMPT_CHANGE_REQUEST.md) into Claude Code. Fill the `What / Where / Why / Severity / Constraints` form at the bottom.
+
+Team Lead will:
+1. Classify the change as **Small / Medium / Large-backend / Large-UX** (rules in [project_description.md §4 step 9](.agent_team/project_description.md#4-process)).
+2. Tell you which agents it plans to spawn and STOP for your approval — so a one-line copy fix doesn't trigger PO + Architect.
+3. After you approve, re-run only those agents; QA does regression on shared flows.
+4. Write `docs/change_report_<title>.md`.
+5. If `docs/deployment.md` exists, ask before re-spawning DevOps to redeploy.
+
+This is the loop you'll use most often once a project is live — the rest of the README assumes a fresh build.
 
 ---
 
@@ -395,7 +442,9 @@ To add a new agent: create `.agent_team/agents/<NAME>_agent.md`, add a row to [.
 agentteam_demoproject/
 │
 ├── .agent_team/                      # Agent coordination (REQUIRED)
-│   ├── project_description.md        #   ← EDIT THIS: project overview, tech stack, external resources
+│   ├── project_description.md        #   ← EDIT THIS: project spec (overview, tech stack, process)
+│   ├── resources.example.md          #   Template for concrete identifiers — copy to resources.md
+│   ├── resources.md                  #   ← YOU CREATE: URLs, slugs, project refs (gitignored)
 │   ├── agents_config.md              #   ← OPTIONAL: change which model each agent uses
 │   ├── agents/                       #   ← OPTIONAL: per-agent instructions
 │   │   ├── PO_agent.md
@@ -407,8 +456,8 @@ agentteam_demoproject/
 │   │   └── DevOps_agent.md
 │   └── task_board.md                 #   ← Auto-generated by Team Lead at kickoff
 │
-├── .mcp.json                         # MCP server declarations (figma, github, vercel)
-├── .env.example                      # Template for MCP secrets — copy to .env
+├── .mcp.json                         # MCP server declarations (figma, github, vercel, supabase)
+├── .env.example                      # Template for secrets + runtime keys — copy to .env
 ├── .env                              #   ← YOU CREATE: real secrets (gitignored, never commit)
 ├── .gitignore
 │
@@ -451,7 +500,7 @@ agentteam_demoproject/
 └── README.md                         # This file
 ```
 
-> Files in `(parentheses)` are created by agents during execution. You must edit **`project_description.md`** for every project, and **`.env` + `.mcp.json`** once per machine if you use Designer or DevOps agents.
+> Files in `(parentheses)` are created by agents during execution. You must edit **`project_description.md`** + **`resources.md`** (copy from `resources.example.md`) for every project, and **`.env` + `.mcp.json`** once per machine if you use Designer or DevOps agents.
 
 ### 5.2 Adapt by tech stack
 
