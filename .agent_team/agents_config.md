@@ -40,7 +40,7 @@ Some agents call external tools via MCP. Configuration lives in [`../.mcp.json`]
 
 1. Add a row to the **Models** table above with the agent name, chosen model, path to its description file, and any MCP servers it uses.
 2. Create the description file at `.agent_team/agents/<NAME>_agent.md` (copy an existing one as a template).
-3. Reference the new agent in [`../_input/1_project_description.md` §3](../_input/1_project_description.md).
+3. Reference the new agent in [`workflow.md` §1](workflow.md).
 4. If the agent needs a new MCP server, add it to [`../.mcp.json`](../.mcp.json) and document required secrets in `.env.example`.
 
 See [README §6](../README.md#6-scaling--adding-agents) for the catalog of common agent types and recommended models.

@@ -1,10 +1,9 @@
 # Project Description
 
-> **Single source of truth for the agent team kickoff.**
+> **Per-project spec** — the agent team reads this file at kickoff for project-specific context.
 > Fill in every `[...]` placeholder below, then start Claude Code and use the short kickoff prompt in [`prompts/2_kickoff.md`](prompts/2_kickoff.md). If your idea is still rough, [`prompts/1_scope.md`](prompts/1_scope.md) lets PO + Architect help flesh it out first. See [`README.md`](README.md) for the full step-by-step.
 >
-> The Team Lead and every sub-agent will read this file at the start of the project.
->
+> **Framework-level info** (which agents exist, the Process / phases, external-resource rules, the `[PLACEHOLDER]` / `N/A` rule) lives in [`../.agent_team/workflow.md`](../.agent_team/workflow.md).
 > **Model assignments live in [`../.agent_team/agents_config.md`](../.agent_team/agents_config.md)** — edit that file to change which model each agent uses.
 > **Per-agent instructions live in [`../.agent_team/agents/`](../.agent_team/agents/)** — edit those files to change agent behavior.
 
@@ -12,20 +11,27 @@
 
 ## 1. Project Overview
 
-**Name:** [PROJECT NAME]
+**Name:** BiteIQ
 
-**One-line summary:** [What this project is, in one sentence.]
+**One-line summary:** AI-powered calorie & macro tracker — log bữa ăn trong 30 giây bằng ảnh, giọng nói, barcode hoặc text.
 
 **Description:**
-[2–4 sentences describing what you are building, who it is for, and why it matters. The PO Agent will break this down into User Stories — be specific about the user and the problem.]
+BiteIQ là web app theo dõi dinh dưỡng dành cho người muốn build thói quen ăn uống lành mạnh mà không tốn thời gian log thủ công. Người dùng chụp ảnh đĩa ăn → AI nhận diện món + ước lượng calo/macro tự động; hoặc quét barcode, nhập giọng nói/text. Dashboard hiển thị tiến độ vs mục tiêu calo & macro theo ngày, weekly insights, và AI chat tư vấn dinh dưỡng. MVP target web; Flutter mobile + publish Google Play / App Store là Phase 2.
 
 **Goals / success criteria:**
-- [Goal 1 — measurable if possible]
-- [Goal 2]
-- [Goal 3]
+- Time-to-first-log < 2 phút từ lúc signup.
+- AI photo recognition đạt ≥ 80% accuracy trên top-100 món Việt + Western phổ biến.
+- Retention proxy: ≥ 4 log/tuần sau tuần đầu cho active user.
+- Page load p95 < 2s; AI vision response p95 < 5s.
+- Supabase free tier đủ cho 1k MAU đầu tiên (không vượt quota DB/storage/edge function).
 
-**Out of scope (optional but recommended):**
-- [Things the team should NOT build]
+**Out of scope (MVP):**
+- Podcast, recipe library kiểu ParrotPal (16k+ recipes) — bỏ.
+- HealthKit / Google Fit integration (chỉ làm khi có mobile Phase 2).
+- Social feed, friends, share recipes / import recipe từ social link.
+- Apple Watch / wearable companion.
+- Workout / exercise tracking (chỉ track calo nạp vào — không tính calo đốt).
+- Native mobile app (Phase 2 — Flutter, publish cả Google Play + App Store).
 
 ---
 
@@ -33,102 +39,38 @@
 
 > **Targets** — fill in only what applies. The agent team uses this to decide which agents to spawn.
 
-- **Web:** `[yes / no]` — if yes, fill in backend + web frontend below.
-- **Mobile:** `[yes / no — iOS only / Android only / both]` — if yes, fill in Flutter section below.
+- **Web:** `yes` — fill in backend + web frontend below.
+- **Mobile:** `no` — Phase 2 sẽ làm Flutter (cả iOS + Android), publish Google Play + App Store. Khi qua Phase 2, update lại file này thành `yes — both` rồi chạy change-request prompt.
 
-**Backend** *(if web=yes)*:
-- **Framework:** [FastAPI / Express / Go Gin / Django / ...]
-- **Database:** [Supabase (Postgres) / SQLite / PostgreSQL / MongoDB / N/A]
-- **Other:** [Redis / Celery / WebSocket / ...]
+**Backend** *(web)*:
+- **Framework:** Next.js 15 API routes (App Router) — không cần service backend riêng cho MVP. Server actions + route handlers cho mọi mutation/query.
+- **Database:** Supabase (Postgres managed) — chọn vì setup nhanh nhất, có sẵn auth/RLS/storage/edge functions, và Supabase MCP đã configured trong repo này (Architect/DEV agent gọi trực tiếp được).
+- **Auth:** Supabase Auth — email/password + Google OAuth.
+- **Storage:** Supabase Storage — bucket cho food photos (private, signed URL).
+- **AI vision:** Claude API (vision) cho nhận diện món ăn từ ảnh + ước lượng portion size/macro. Cache kết quả theo image hash.
+- **Food DB lookup:** Open Food Facts API (free, có barcode endpoint) làm primary; fallback sang Claude inference khi không match.
+- **Other:** Supabase Edge Functions cho các tác vụ async (weekly insights cron, AI cost metering).
 
-**Web frontend** *(if web=yes)*:
-- **Framework:** [React / Vue / Next.js / ...]
-- **Testing:** [Playwright (E2E required) + jest / vitest for unit]
+**Web frontend** *(web)*:
+- **Framework:** Next.js 15 (App Router) + React 19 + TypeScript strict mode.
+- **Styling:** Tailwind CSS + shadcn/ui component library.
+- **Camera / barcode:** `@zxing/browser` cho barcode scan qua webcam; `<input type="file" accept="image/*" capture="environment">` cho photo upload trên mobile browser.
+- **Voice input:** Web Speech API (browser native) cho voice-to-text log.
+- **Client state:** TanStack Query (server state) + Zustand (UI state).
+- **Testing:** **Playwright (E2E required)** cho golden path (signup → log meal → see dashboard); Vitest cho unit/component test.
 
-**Mobile (Flutter)** *(if mobile=yes)*:
-- **Min SDK:** [e.g. iOS 14, Android 7 (API 24)]
-- **State management:** [Riverpod / Bloc / Provider — default Riverpod]
-- **Distribution:** [TestFlight / Play Console internal / Firebase App Distribution / public stores]
-- **Testing:** [`flutter test` for unit/widget + `integration_test` for E2E]
-
----
-
-## 3. Agent Team
-
-The team and per-agent instructions:
-
-- **Team Lead / Orchestrator** — coordinates progress via the shared task board (your main Claude Code session).
-- **PO Agent** — see [`../.agent_team/agents/PO_agent.md`](../.agent_team/agents/PO_agent.md).
-- **Architect Agent** — see [`../.agent_team/agents/Architect_agent.md`](../.agent_team/agents/Architect_agent.md).
-- **Designer Agent** — see [`../.agent_team/agents/Designer_agent.md`](../.agent_team/agents/Designer_agent.md). *(skip for backend-only projects)*
-- **DEV Agent** — see [`../.agent_team/agents/DEV_agent.md`](../.agent_team/agents/DEV_agent.md). *(skip if mobile-only — Flutter Agent covers it)*
-- **Flutter Agent** — see [`../.agent_team/agents/Flutter_agent.md`](../.agent_team/agents/Flutter_agent.md). *(only when project targets mobile — see §2 Tech Stack)*
-- **QA Agent** — see [`../.agent_team/agents/QA_agent.md`](../.agent_team/agents/QA_agent.md).
-- **DevOps Agent** — see [`../.agent_team/agents/DevOps_agent.md`](../.agent_team/agents/DevOps_agent.md).
-
-Models for each agent are defined in [`../.agent_team/agents_config.md`](../.agent_team/agents_config.md).
-
-> Add or remove agents to fit the project. See [`../README.md` §6](../README.md#6-scaling--adding-agents) for the catalog of agent types and recommended models.
+**Mobile (Flutter)** *(Phase 2 — bỏ qua cho MVP)*:
+- N/A cho MVP. Khi qua Phase 2 sẽ điền: Min SDK iOS 14 / Android 8 (API 26), Riverpod, distribution qua Play Console internal + TestFlight, test bằng `flutter test` + `integration_test`.
 
 ---
 
-## 4. Process
+## 3. Constraints & Notes
 
-1. Create `.agent_team/task_board.md` (read this file for project context).
-2. **PO Agent** → write `docs/user_stories.md` (reads `_input/3_po_input/` + `_input/1_project_description.md`).
-3. **Architect Agent** + **Designer Agent** *(in parallel)* → `docs/api_contract.md` (+ `docs/tech_design.md` if non-trivial) and `docs/design_spec.md`. *(Skip Designer for backend-only projects.)*
-4. **Implementation phase** — picks one of these paths based on Tech Stack (§2):
-   - **Web only:** **DEV Agent** → backend + web frontend + unit tests + E2E tests.
-   - **Mobile only:** **Flutter Agent** → mobile app + unit tests + integration tests.
-   - **Web + Mobile:** **DEV Agent** first (so the API client and patterns are settled), then **Flutter Agent** consumes the same API contract.
-5. **QA Agent** → run all tests **locally** (Playwright for web, `integration_test` for Flutter), review code, write `docs/qa_report.md`.
-6. **Team Lead — INTERIM report + deployment gate.** Compile a report covering everything done locally so far (what was built, QA results, known issues), write it to `docs/interim_report.md`, then **stop and ask the user**: *"Ready to push to GitHub and deploy via DevOps Agent? Or stop here / fix something first?"* **Do not spawn DevOps without explicit user approval.**
-7. **DevOps Agent** *(only if user approves at step 6)* → push to GitHub, set up CI; deploy to Vercel for web and/or set up GitHub Actions macOS runner + TestFlight/Play Console pipeline for mobile. Write `docs/deployment.md`.
-8. **Team Lead — FINAL report.** After DevOps finishes, compile a final report at `docs/final_report.md` covering everything from the interim report **plus** deployment URLs, CI status, GitHub Secrets the user must add manually, and any first-deploy follow-ups (custom domain, store review, etc.).
-9. **Change Request loop** *(any time after QA — design tweak, new requirement, bug found post-deploy)*. The kickoff prompt for this lives in [`prompts/3_change_request.md`](prompts/3_change_request.md). Team Lead classifies the change and re-runs the **minimum** set of agents — do not re-run the whole pipeline:
-   - **Small** (copy, color, spacing, single-component bugfix) → **DEV Agent** → **QA Agent** (regression on affected flows). Skip PO / Architect / Designer.
-   - **Medium** (layout change, new component, design tokens) → **Designer Agent** → **DEV / Flutter Agent** → **QA Agent**. Skip PO / Architect.
-   - **Large — backend/API** (new endpoint, schema change, business logic) → **PO Agent** (append story) → **Architect Agent** (update contract) → **DEV / Flutter Agent** → **QA Agent**. Skip Designer.
-   - **Large — UX/flow** (new screens, changed user journey) → full re-run **PO → Architect → Designer → DEV / Flutter → QA** (treat as v2).
-
-   Rules for the loop:
-   - **Append, don't rewrite** — add new sections to `docs/user_stories.md`, `docs/design_spec.md`, `docs/api_contract.md` rather than overwriting, so history is preserved.
-   - **Regression scope** — QA must test all flows that share code with the changed component, not only the new behavior.
-   - **Task board** — open a new section `## Phase 9 — Change Request: <short title>` in `task_board.md`; agents pass the baton through it as in normal phases.
-   - **Change report** — Team Lead writes `docs/change_report_<short-title>.md` after QA passes (what changed, agents run, QA results, files touched).
-   - **Redeploy gate** — if `docs/deployment.md` exists (project already shipped), STOP after QA and ask the user before spawning DevOps Agent for redeploy (same human gate as step 6).
-
-Agents communicate via `task_board.md` — never via chat. Each agent updates the task board's messages table when completing its phase.
-
----
-
-## 5. External resources
-
-Concrete identifiers (URLs, slugs, project refs, bundle IDs, paths) live in **[`2_resources.md`](2_resources.md)** — a separate file gitignored by default. Copy [`2_resources.example.md`](2_resources.example.md) → `2_resources.md` and fill it in once for the project. Agents read it before asking you for any value.
-
-Secrets (tokens, API keys) live in `.env` (gitignored, copy from [`../.env.example`](../.env.example)). See [`../README.md` §1.4](../README.md#14-mcp-configuration) for setup.
-
-Mobile signing keys go in **GitHub Secrets**, not `.env` or `2_resources.md`. DevOps Agent will list the exact names in `docs/deployment.md`.
-
-## 5.1 How to handle missing values
-
-When filling in `1_project_description.md` or `2_resources.md`, you have three options for any field:
-
-| Marker | Meaning | What agents do |
-|--------|---------|----------------|
-| **A real value** | You know what you want | Use it as-is. |
-| **`[PLACEHOLDER]`** *(square brackets, default in template)* | Not filled in yet | Ask you in chat, then write the answer back to the file. |
-| **`N/A`** | You explicitly defer the decision | Do NOT ask you again. The responsible agent (PO / Architect / Designer / DEV / Flutter / DevOps) makes a reasonable default decision, documents it in their deliverable, and flags it in `task_board.md`. Team Lead surfaces all `N/A`-derived decisions in the interim/final report so you can override later. |
-
-Use `N/A` when you trust the relevant agent's judgment more than your own (e.g. you know nothing about state management → write `state_management: N/A` and let Flutter Agent pick).
-
----
-
-## 6. Constraints & Notes
-
-- **Performance:** [e.g. p95 < 200ms / N/A]
-- **Security:** [e.g. JWT auth, OWASP Top 10 review / N/A]
-- **Scalability:** [e.g. 1k concurrent users / N/A]
-- **Compliance:** [e.g. GDPR, HIPAA / N/A]
-- [Hard constraints — e.g. must run on Windows, no external SaaS calls, MIT-compatible deps only, etc.]
-- [Anything else the team should know but a reader could not infer from the code alone]
+- **Performance:** Page load p95 < 2s; AI vision response p95 < 5s; barcode scan recognize < 1s sau khi camera focus.
+- **Security:** Supabase RLS bật mặc định trên mọi table có user data; OWASP Top 10 review trước khi deploy; không log PII; rate limit AI vision endpoint per-user.
+- **Scalability:** MVP target 1k MAU trên Supabase free tier; schema thiết kế sao cho scale lên 10k MAU không cần migration phá vỡ.
+- **AI cost guardrails:** Cap chi phí Claude vision per-user — free tier 5 photo/ngày, paid tier unlimited (subscription model giống ParrotPal). Cache recognition theo image hash để tránh re-charge cho cùng ảnh.
+- **Compliance:** GDPR cho EU users (data export + account deletion endpoint bắt buộc); disclaimer rõ ràng "không thay thế tư vấn y tế / dinh dưỡng chuyên môn" — không tuyên bố medical/clinical claim.
+- **Internationalization:** MVP English only, nhưng dùng `next-intl` từ đầu để add Vietnamese sau không phải refactor.
+- **Hosting:** Vercel (Next.js) + Supabase — cả hai có free tier đủ cho MVP. CI/CD qua GitHub Actions (DevOps phase).
+- **No external SaaS lock-in beyond Supabase + Vercel + Anthropic** — tránh thêm vendor để giữ migration path mở.

@@ -1,16 +1,17 @@
 CHANGE REQUEST — re-run a subset of the agent team after QA / deploy.
 
-I want to change something the team has already finished. Handle this per _input/1_project_description.md §4 step 9 (Change Request loop).
+I want to change something the team has already finished. Handle this per .agent_team/workflow.md §2 step 9 (Change Request loop).
 
 Process:
 1. Ground yourself. Read in this order:
-   - _input/1_project_description.md (§4 step 9 — the rules for this loop)
+   - .agent_team/workflow.md (§2 step 9 — the rules for this loop)
+   - _input/1_project_description.md (project scope + constraints)
    - .agent_team/task_board.md (current state — what phase the team last completed)
    - docs/user_stories.md, docs/design_spec.md, docs/api_contract.md (existing agreements you must not silently break)
    - docs/qa_report.md (last QA pass — this is the regression baseline)
    - docs/deployment.md if it exists (signals the project has shipped → redeploy gate applies)
 
-2. Classify the change as one of: **Small / Medium / Large-backend / Large-UX** per §4 step 9. Report back to me in chat with:
+2. Classify the change as one of: **Small / Medium / Large-backend / Large-UX** per .agent_team/workflow.md §2 step 9. Report back to me in chat with:
    - The classification + reasoning (why not the next tier up or down).
    - Which agents you plan to spawn, in which order.
    - Which existing docs will get appended sections and which files will likely change.

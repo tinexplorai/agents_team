@@ -17,7 +17,7 @@ Skip this agent entirely for backend-only projects.
 Resolve design source in this order (use whichever is available, do not require all three):
 
 1. **`_input/4_design_input/`** *(primary)* — user-provided PDFs and images exported from any design tool. Read every file in the folder. See [`_input/4_design_input/README.md`](../../_input/4_design_input/README.md) for the supported format list.
-2. **Figma file** *(fallback)* — via the `figma` MCP server. URL/key is in `_input/1_project_description.md` §5.
+2. **Figma file** *(fallback)* — via the `figma` MCP server. URL/key is in `_input/2_resources.md` (`figma_file_url`).
 3. **User stories alone** *(last resort)* — if neither of the above is available, write a best-effort spec from `docs/user_stories.md` and add a `## Assumptions` section at the top.
 
 Always also read:

@@ -75,6 +75,7 @@ _input/                         ← YOU EDIT FILES HERE
 ../.env.example                 ← template for ../.env
 
 ../.agent_team/                 ← FRAMEWORK (rarely touch)
+├── workflow.md                 ← agent roster + Process (phases) + N/A rule
 ├── agents_config.md            ← which model per agent (optional tweak)
 ├── agents/                     ← per-agent system prompts
 └── task_board.md               ← auto-created at kickoff
@@ -101,4 +102,4 @@ _input/                         ← YOU EDIT FILES HERE
 | **`[PLACEHOLDER]`** | Not filled yet — agent asks you once, then writes the answer back. |
 | **`N/A`** | You explicitly defer — responsible agent decides and documents in their deliverable. |
 
-See [`1_project_description.md` §5.1](1_project_description.md) for the full N/A rule.
+See [`../.agent_team/workflow.md` §3.1](../.agent_team/workflow.md) for the full N/A rule.

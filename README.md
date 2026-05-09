@@ -122,7 +122,7 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
 > **Three-file split:**
 > - **`.env`** — secrets only (tokens, API keys, runtime keys like `SUPABASE_ANON_KEY`).
 > - **`_input/2_resources.md`** — non-secret identifiers (URLs, slugs, project refs, bundle IDs, paths). Agents look up values here before asking you.
-> - **`_input/1_project_description.md`** — project spec (goals, tech stack, agent list, process). Stable after kickoff.
+> - **`_input/1_project_description.md`** — per-project spec (goals, tech stack, constraints). Stable after kickoff. Agent roster + Process live in `.agent_team/workflow.md`.
 >
 > **Skip what you don't need:**
 > - Backend-only project → leave `FIGMA_API_KEY` blank and skip the Designer Agent.
@@ -243,6 +243,7 @@ _input/                       ← YOU fill in (project spec, resources, design r
 └── prompts/                  ← Paste these into Claude Code
 
 .agent_team/                  ← FRAMEWORK (rarely edit)
+├── workflow.md               ← Agent roster + Process (phases) + N/A rule
 ├── agents_config.md          ← Model assignments
 ├── agents/                   ← Per-agent system prompts
 ├── task_board.md             ← Task tracking + message log (auto-generated)
@@ -294,7 +295,7 @@ cd /path/to/my-new-project/
 Everything you fill in per project lives in [`_input/`](_input/). Required:
 
 - **[_input/1_project_description.md](_input/1_project_description.md)** — replace every `[...]` placeholder (overview, tech stack, constraints).
-- **[_input/2_resources.md](_input/2_resources.md)** — copy from [_input/2_resources.example.md](_input/2_resources.example.md) and fill in concrete identifiers (URLs, slugs, project refs). Use `N/A` to defer (see [§5.1 of project description](_input/1_project_description.md)).
+- **[_input/2_resources.md](_input/2_resources.md)** — copy from [_input/2_resources.example.md](_input/2_resources.example.md) and fill in concrete identifiers (URLs, slugs, project refs). Use `N/A` to defer (see [.agent_team/workflow.md §3.1](.agent_team/workflow.md)).
 
 Optional:
 
@@ -356,7 +357,7 @@ You can intervene at any time during execution:
 When QA has finished (or the project is already deployed) and you want to change something — design tweak, new feature, bug found in production — paste the contents of [`_input/prompts/3_change_request.md`](_input/prompts/3_change_request.md) into Claude Code. Fill the `What / Where / Why / Severity / Constraints` form at the bottom.
 
 Team Lead will:
-1. Classify the change as **Small / Medium / Large-backend / Large-UX** (rules in [_input/1_project_description.md §4 step 9](_input/1_project_description.md#4-process)).
+1. Classify the change as **Small / Medium / Large-backend / Large-UX** (rules in [.agent_team/workflow.md §2 step 9](.agent_team/workflow.md#2-process)).
 2. Tell you which agents it plans to spawn and STOP for your approval — so a one-line copy fix doesn't trigger PO + Architect.
 3. After you approve, re-run only those agents; QA does regression on shared flows.
 4. Write `docs/change_report_<title>.md`.
@@ -380,7 +381,7 @@ Each agent's instructions live in its own file under `.agent_team/agents/`. Edit
 | QA Agent | [.agent_team/agents/QA_agent.md](.agent_team/agents/QA_agent.md) |
 | DevOps Agent | [.agent_team/agents/DevOps_agent.md](.agent_team/agents/DevOps_agent.md) |
 
-To add a new agent: create `.agent_team/agents/<NAME>_agent.md`, add a row to [.agent_team/agents_config.md](.agent_team/agents_config.md), and reference it in [_input/1_project_description.md](_input/1_project_description.md) §3.
+To add a new agent: create `.agent_team/agents/<NAME>_agent.md`, add a row to [.agent_team/agents_config.md](.agent_team/agents_config.md), and reference it in [.agent_team/workflow.md](.agent_team/workflow.md) §1.
 
 ---
 
@@ -406,6 +407,7 @@ agentteam_demoproject/
 │       └── 3_change_request.md       #     Step 7: change after QA / deploy
 │
 ├── .agent_team/                      # Framework internals (rarely edit)
+│   ├── workflow.md                   #   Agent roster + Process (phases) + N/A rule
 │   ├── agents_config.md              #   ← OPTIONAL: change which model each agent uses
 │   ├── agents/                       #   ← OPTIONAL: per-agent system prompts
 │   │   ├── PO_agent.md
