@@ -18,7 +18,7 @@ Place design references exported from your design tool (Claude design, Figma, Pe
 If you have multiple files, prefix with a number so the agent reads them in order:
 
 ```
-_input/4_design_input/
+docs/design_input/
 ├── 01_login.pdf
 ├── 02_dashboard.png
 ├── 03_settings.png
