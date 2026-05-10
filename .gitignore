@@ -3,8 +3,8 @@
 .env.local
 .env.*.local
 
-# Project resources (real values — copy from _input/2_resources.example.md)
-_input/2_resources.md
+# Project resources (real values — copy from resources.example.md)
+.agent_team/resources.md
 
 # Node / JavaScript
 node_modules/

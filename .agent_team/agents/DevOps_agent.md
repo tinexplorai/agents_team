@@ -20,7 +20,7 @@ Look at the project structure to decide what you're shipping:
 
 ## Required values (look up before asking)
 
-All concrete identifiers below should already be in `_input/2_resources.md`. **Follow the lookup protocol at the top of that file:** read first, only ask the user if a value is `[PLACEHOLDER]` or missing, write the answer back to `_input/2_resources.md` after the user provides it. If a value is `N/A`, decide reasonably and document the choice in `docs/deployment.md`.
+All concrete identifiers below should already be in `.agent_team/resources.md`. **Follow the lookup protocol at the top of that file:** read first, only ask the user if a value is `[PLACEHOLDER]` or missing, write the answer back to `resources.md` after the user provides it. If a value is `N/A`, decide reasonably and document the choice in `docs/deployment.md`.
 
 **Always:**
 - `github_repo_url`, `default_branch`.
@@ -31,14 +31,14 @@ All concrete identifiers below should already be in `_input/2_resources.md`. **F
 
 **For mobile deploys:**
 - `bundle_id`, `apple_team_id`, `ios_distribution_channel`, `android_package`, `android_distribution_channel`.
-- Signing material (iOS .p12 + provisioning profile, App Store Connect API key, Android keystore, Play service account JSON) — these go in **GitHub Secrets**, NOT `.env` and NOT `_input/2_resources.md`. List the exact secret names in `docs/deployment.md` and instruct the user to add them via repo Settings → Secrets and variables → Actions.
+- Signing material (iOS .p12 + provisioning profile, App Store Connect API key, Android keystore, Play service account JSON) — these go in **GitHub Secrets**, NOT `.env` and NOT `resources.md`. List the exact secret names in `docs/deployment.md` and instruct the user to add them via repo Settings → Secrets and variables → Actions.
 
 ## Inputs
 
 - `backend/`, `frontend/`, `mobile/` — whichever exist.
 - `docs/qa_report.md` — must read **PASS** or **PASS WITH NOTES**. If **FAIL**, do not deploy; flag back to Team Lead.
-- `_input/1_project_description.md` — tech stack (informs CI matrix, Vercel preset, mobile platforms).
-- `_input/2_resources.md` — every identifier listed in "Required values" above.
+- `.agent_team/project_description.md` — tech stack (informs CI matrix, Vercel preset, mobile platforms).
+- `.agent_team/resources.md` — every identifier listed in "Required values" above.
 - `.env` — reference for runtime env var values to wire into Vercel.
 
 ## Tasks

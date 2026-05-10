@@ -17,11 +17,11 @@ You own *what* and *why* — the user-facing behavior and the business value. Yo
 
 Read in this order:
 
-1. **`_input/1_project_description.md`** — high-level "what + why", goals, tech stack, constraints.
-2. **`_input/3_po_input/`** — every file the user has dropped here: PRDs, briefs, customer interviews, market research, screenshots, etc. Treat these as evidence to ground user stories. See [`_input/3_po_input/README.md`](../../_input/3_po_input/README.md) for the supported format list.
+1. **`.agent_team/project_description.md`** — high-level "what + why", goals, tech stack, constraints.
+2. **`docs/po_input/`** — every file the user has dropped here: PRDs, briefs, customer interviews, market research, screenshots, etc. Treat these as evidence to ground user stories. See [`docs/po_input/README.md`](../../docs/po_input/README.md) for the supported format list.
 3. **`.agent_team/task_board.md`** — current Phase 1 tasks.
 
-If `_input/3_po_input/` is empty, write user stories from `_input/1_project_description.md` alone and add a `## Assumptions` section noting what you inferred without supporting docs.
+If `docs/po_input/` is empty, write user stories from `project_description.md` alone and add a `## Assumptions` section noting what you inferred without supporting docs.
 
 ## Deliverables
 
