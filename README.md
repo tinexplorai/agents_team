@@ -23,7 +23,7 @@
 
 ### 1.1 Prerequisites
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) or VS Code Extension
+- [Claude Code CLI](https://docs.anthropic.com/en/project_code/documentation/claude-code) or VS Code Extension
 - Git (recommended)
 - Runtime for your tech stack (Python, Node.js, Go, etc.)
 
@@ -58,7 +58,7 @@ claude
 
 #### Per-agent model assignment
 
-Models are configured in **[.agent_team/agents_config.md](.agent_team/agents_config.md)** — one file, one place to change.
+Models are configured in **[agent_team/agents_config.md](agent_team/agents_config.md)** — one file, one place to change.
 
 To switch a model: open that file, edit the `Model` column for the agent you want to change, save. Agents read this file when spawned.
 
@@ -68,7 +68,7 @@ To switch a model: open that file, edit the `Model` column for the agent you wan
 |-------|-------|-----|
 | **Team Lead** | `opus` | Complex coordination, architecture decisions |
 | **PO Agent** | `opus` | Deep requirement analysis, edge case thinking |
-| **Architect Agent** | `opus` | API contract + tech design, decisions costly to change |
+| **TechLead Agent** | `opus` | API contract + tech design, decisions costly to change |
 | **Designer Agent** | `sonnet` | Translate design refs → spec; pattern-matching task |
 | **DEV Agent** | `sonnet` | Fast code generation, good quality |
 | **Flutter Agent** | `sonnet` | Mobile code generation; same reasoning as DEV |
@@ -86,8 +86,8 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
 
 | Agent | MCP server | Purpose |
 |-------|------------|---------|
-| Designer Agent | `figma` *(optional)* | Pull design frames if no `_input/4_design_input/` files are provided |
-| Architect Agent | `supabase` *(if DB)* | Inspect / propose schema |
+| Designer Agent | `figma` *(optional)* | Pull design frames if no `project_setup/step_3_design/` files are provided |
+| TechLead Agent | `supabase` *(if DB)* | Inspect / propose schema |
 | DEV Agent | `supabase` *(if DB)* | Run migrations, seed data |
 | Flutter Agent | `supabase` *(if DB)* | Same — for mobile apps that talk directly to Supabase |
 | DevOps Agent | `github` | Push code, create CI workflow, set branch protection |
@@ -111,18 +111,18 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
    ```
 4. **Configure resources:**
    ```bash
-   cp _input/2_resources.example.md _input/2_resources.md
-   # then edit _input/2_resources.md and fill in non-secret identifiers (project_ref, GitHub repo URL, Vercel slugs, bundle ID, etc.)
+   cp .env.example.md .env.md
+   # then edit .env.md and fill in non-secret identifiers (project_ref, GitHub repo URL, Vercel slugs, bundle ID, etc.)
    ```
 5. **Update [`.mcp.json`](.mcp.json)** — replace `<team-slug>/<project-slug>` in the `vercel` server URL with your actual Vercel team and project slugs.
 6. **Restart Claude Code** — `.mcp.json` is loaded at startup, so the servers won't be available until you restart.
 
-> `.env` and `_input/2_resources.md` are both gitignored. Never commit them. The `.example` files are safe to commit.
+> `.env` and `.env.md` are both gitignored. Never commit them. The `.example` files are safe to commit.
 >
 > **Three-file split:**
 > - **`.env`** — secrets only (tokens, API keys, runtime keys like `SUPABASE_ANON_KEY`).
-> - **`_input/2_resources.md`** — non-secret identifiers (URLs, slugs, project refs, bundle IDs, paths). Agents look up values here before asking you.
-> - **`_input/1_project_description.md`** — project spec (goals, tech stack, agent list, process). Stable after kickoff.
+> - **`.env.md`** — non-secret identifiers (URLs, slugs, project refs, bundle IDs, paths). Agents look up values here before asking you.
+> - **`project_setup/step_1_project.md`** — per-project spec (goals, tech stack, constraints). Stable after kickoff. Agent roster + Process live in `agent_team/workflow.md`.
 >
 > **Skip what you don't need:**
 > - Backend-only project → leave `FIGMA_API_KEY` blank and skip the Designer Agent.
@@ -150,7 +150,7 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
                               │
                     ┌─────────▼────────────┐
                     │  PO Agent (opus)     │  Phase 1
-                    │  + _input/3_po_input/    │
+                    │  + project_setup/step_2_requirements/    │
                     └─────────┬────────────┘
                               │
                     ┌─────────┴─────────┐
@@ -203,7 +203,7 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
                                │
                     ┌──────────▼──────────────────┐
                     │  Phase 9 — Change Request   │  ◄── any time after QA
-                    │  (loop, on user request)    │      see _input/prompts/3_change_request.md
+                    │  (loop, on user request)    │      see project_kickoff/2_prompt_change_request.md
                     │  Team Lead classifies:      │
                     │   Small  → DEV → QA         │
                     │   Medium → Designer → DEV   │
@@ -222,13 +222,13 @@ Some agents call external tools via [MCP](https://modelcontextprotocol.io):
 | Agent | Role | Input | Output | MCP |
 |-------|------|-------|--------|-----|
 | **Team Lead** | Orchestrate, spawn agents, compile reports | User request | Final report | — |
-| **PO Agent** | Analyze requirements, write User Stories | `_input/1_project_description.md` + `_input/3_po_input/` | `docs/user_stories.md` | — |
-| **Architect Agent** | Define API contract + cross-cutting tech design + DB schema | User Stories + tech stack | `docs/api_contract.md` (+ `docs/tech_design.md`) | `supabase` *(if DB)* |
-| **Designer Agent** | Translate design refs + user stories into UI spec | User Stories + `_input/4_design_input/` (or Figma) | `docs/design_spec.md` (+ `docs/design_assets/`) | `figma` *(optional)* |
+| **PO Agent** | Analyze requirements, write User Stories | `project_setup/step_1_project.md` + `project_setup/step_2_requirements/` | `project_code/documentation/user_stories.md` | — |
+| **TechLead Agent** | Define API contract + cross-cutting tech design + DB schema | User Stories + tech stack | `project_code/documentation/api_contract.md` (+ `project_code/documentation/tech_design.md`) | `supabase` *(if DB)* |
+| **Designer Agent** | Translate design refs + user stories into UI spec | User Stories + `project_setup/step_3_design/` (or Figma) | `project_code/documentation/design_spec.md` (+ `project_code/documentation/design_assets/`) | `figma` *(optional)* |
 | **DEV Agent** | Code backend + web frontend + tests | User Stories + API contract + Design spec | Source code in `backend/`, `frontend/` + tests | `supabase` *(if DB)* |
 | **Flutter Agent** | Code mobile app + tests; APK locally, IPA via CI | User Stories + API contract + Design spec | Source code in `mobile/` + tests | `supabase` *(if DB)* |
-| **QA Agent** | Run tests (Playwright + Flutter integration_test), review code, report bugs | Source code | `docs/qa_report.md` | — |
-| **DevOps Agent** | Push to GitHub + CI; deploy web to Vercel and/or set up mobile CI for TestFlight/Play Console | Source code + QA pass | `docs/deployment.md` | `github`, `vercel` |
+| **QA Agent** | Run tests (Playwright + Flutter integration_test), review code, report bugs | Source code | `project_code/documentation/qa_report.md` | — |
+| **DevOps Agent** | Push to GitHub + CI; deploy web to Vercel and/or set up mobile CI for TestFlight/Play Console | Source code + QA pass | `project_code/documentation/deployment.md` | `github`, `vercel` |
 
 ### 2.3 Communication
 
@@ -240,9 +240,10 @@ _input/                       ← YOU fill in (project spec, resources, design r
 ├── 2_resources.md            ← Concrete identifiers (you create + fill in)
 ├── 3_po_input/               ← PO reference docs
 ├── 4_design_input/           ← Design files
-└── prompts/                  ← Paste these into Claude Code
+└── project_kickoff/                  ← Paste these into Claude Code
 
-.agent_team/                  ← FRAMEWORK (rarely edit)
+agent_team/                  ← FRAMEWORK (rarely edit)
+├── workflow.md               ← Agent roster + Process (phases) + N/A rule
 ├── agents_config.md          ← Model assignments
 ├── agents/                   ← Per-agent system prompts
 ├── task_board.md             ← Task tracking + message log (auto-generated)
@@ -264,7 +265,7 @@ Team Lead ──→ User (HUMAN GATE):     "Interim report ready —     (Phase 
 Team Lead ──→ DevOps Agent:          "Approved — go ship"        (Phase 6)
 DevOps    ──→ Team Lead:             "Shipped — see deployment"  (Phase 7 done)
 Team Lead ──→ User:                   Final summary               (Phase 8)
-   ↓ user later requests a change (paste _input/prompts/3_change_request.md)
+   ↓ user later requests a change (paste project_kickoff/2_prompt_change_request.md)
 Team Lead ──→ User:                  "Classified as <S/M/L>,        (Phase 9)
                                        plan: <agents>. Approve?"
    ↓ user approves
@@ -279,7 +280,7 @@ Team Lead ──→ User (HUMAN GATE):     "Redeploy? (only if shipped)"
 
 ## 3. Step-by-Step Guide
 
-> **Single canonical checklist:** [`_input/README.md`](_input/README.md). The summary below mirrors it — when in doubt, follow `_input/README.md` and the prompt files in [`_input/prompts/`](_input/prompts/).
+> **Single canonical checklist:** [`project_setup/README.md`](project_setup/README.md). The summary below mirrors it — when in doubt, follow `project_setup/README.md` and the prompt files in [`project_kickoff/`](project_kickoff/).
 
 ### Step 1: Copy this template
 
@@ -293,16 +294,16 @@ cd /path/to/my-new-project/
 
 Everything you fill in per project lives in [`_input/`](_input/). Required:
 
-- **[_input/1_project_description.md](_input/1_project_description.md)** — replace every `[...]` placeholder (overview, tech stack, constraints).
-- **[_input/2_resources.md](_input/2_resources.md)** — copy from [_input/2_resources.example.md](_input/2_resources.example.md) and fill in concrete identifiers (URLs, slugs, project refs). Use `N/A` to defer (see [§5.1 of project description](_input/1_project_description.md)).
+- **[project_setup/step_1_project.md](project_setup/step_1_project.md)** — replace every `[...]` placeholder (overview, tech stack, constraints).
+- **[.env.md](.env.md)** — copy from [.env.example.md](.env.example.md) and fill in concrete identifiers (URLs, slugs, project refs). Use `N/A` to defer (see [agent_team/workflow.md §3.1](agent_team/workflow.md)).
 
 Optional:
 
-- **[_input/3_po_input/](_input/3_po_input/)** — drop PRDs / briefs / interviews (PO reads).
-- **[_input/4_design_input/](_input/4_design_input/)** — drop PDFs / images (Designer reads).
+- **[project_setup/step_2_requirements/](project_setup/step_2_requirements/)** — drop PRDs / briefs / interviews (PO reads).
+- **[project_setup/step_3_design/](project_setup/step_3_design/)** — drop PDFs / images (Designer reads).
 - **`.env`** — copy from `.env.example`, fill in tokens (Designer / DevOps / Supabase).
-- **[.agent_team/agents_config.md](.agent_team/agents_config.md)** — change model assignment per agent.
-- **[.agent_team/agents/](.agent_team/agents/)** — edit any `<NAME>_agent.md` to change agent behavior.
+- **[agent_team/agents_config.md](agent_team/agents_config.md)** — change model assignment per agent.
+- **[agent_team/agents/](agent_team/agents/)** — edit any `<NAME>_agent.md` to change agent behavior.
 - **[.mcp.json](.mcp.json)** — only if Designer or DevOps agent is in scope. See [§1.4](#14-mcp-configuration).
 
 > **Don't have a fully-formed project description yet?** Skip the placeholders and use the scoping prompt at Step 4 — PO + Architect will help flesh it out before any code is written.
@@ -316,23 +317,22 @@ claude
 
 ### Step 4: (Optional) Scope the project with PO + Architect
 
-**When to use:** `_input/1_project_description.md` is rough, no tech stack picked yet, or you want a fresh perspective.
+**When to use:** `project_setup/step_1_project.md` is rough, no tech stack picked yet, or you want a fresh perspective.
 **When to skip:** the file is already filled in carefully — go straight to Step 5.
 
-Paste the contents of [`_input/prompts/1_scope.md`](_input/prompts/1_scope.md) into Claude Code (fill in your rough idea between the `=== START ===` / `=== END ===` markers).
 
 **What you'll see:**
 
 1. ~30 seconds later, PO and Architect both report back with concrete proposals + 3–5 questions each.
 2. You answer the questions in one short reply (bullet points are fine).
-3. Team Lead writes the refined values into `_input/1_project_description.md` and shows you the diff.
+3. Team Lead writes the refined values into `project_setup/step_1_project.md` and shows you the diff.
 4. You either say *"approve"* (Team Lead runs the kickoff prompt automatically) or *"refine: change X to Y"* to loop again.
 
 **Tip:** mid-scoping you can always change direction — say *"actually drop mobile, web only"* or *"shrink scope to MVP only"* and the loop adjusts. No code has been written yet, so changes are free.
 
 ### Step 5: Kick off the agent team
 
-If you skipped Step 4, paste the contents of [`_input/prompts/2_kickoff.md`](_input/prompts/2_kickoff.md) into Claude Code — no editing needed.
+If you skipped Step 4, paste the contents of [`project_kickoff/1_prompt_kickoff.md`](project_kickoff/1_prompt_kickoff.md) into Claude Code — no editing needed.
 
 If you used Step 4, the scoping flow runs this prompt automatically once you say "approve".
 
@@ -353,14 +353,14 @@ You can intervene at any time during execution:
 
 ### Step 7: Request a change after QA / deploy
 
-When QA has finished (or the project is already deployed) and you want to change something — design tweak, new feature, bug found in production — paste the contents of [`_input/prompts/3_change_request.md`](_input/prompts/3_change_request.md) into Claude Code. Fill the `What / Where / Why / Severity / Constraints` form at the bottom.
+When QA has finished (or the project is already deployed) and you want to change something — design tweak, new feature, bug found in production — paste the contents of [`project_kickoff/2_prompt_change_request.md`](project_kickoff/2_prompt_change_request.md) into Claude Code. Fill the `What / Where / Why / Severity / Constraints` form at the bottom.
 
 Team Lead will:
-1. Classify the change as **Small / Medium / Large-backend / Large-UX** (rules in [_input/1_project_description.md §4 step 9](_input/1_project_description.md#4-process)).
+1. Classify the change as **Small / Medium / Large-backend / Large-UX** (rules in [agent_team/workflow.md §2 step 9](agent_team/workflow.md#2-process)).
 2. Tell you which agents it plans to spawn and STOP for your approval — so a one-line copy fix doesn't trigger PO + Architect.
 3. After you approve, re-run only those agents; QA does regression on shared flows.
-4. Write `docs/change_report_<title>.md`.
-5. If `docs/deployment.md` exists, ask before re-spawning DevOps to redeploy.
+4. Write `project_code/documentation/change_report_<title>.md`.
+5. If `project_code/documentation/deployment.md` exists, ask before re-spawning DevOps to redeploy.
 
 This is the loop you'll use most often once a project is live — the rest of the README assumes a fresh build.
 
@@ -368,19 +368,19 @@ This is the loop you'll use most often once a project is live — the rest of th
 
 ## 4. Agent Instructions
 
-Each agent's instructions live in its own file under `.agent_team/agents/`. Edit these files to change agent behavior — Team Lead reads them when spawning each sub-agent.
+Each agent's instructions live in its own file under `agent_team/agents/`. Edit these files to change agent behavior — Team Lead reads them when spawning each sub-agent.
 
 | Agent | Instruction file |
 |-------|------------------|
-| PO Agent | [.agent_team/agents/PO_agent.md](.agent_team/agents/PO_agent.md) |
-| Architect Agent | [.agent_team/agents/Architect_agent.md](.agent_team/agents/Architect_agent.md) |
-| Designer Agent | [.agent_team/agents/Designer_agent.md](.agent_team/agents/Designer_agent.md) |
-| DEV Agent | [.agent_team/agents/DEV_agent.md](.agent_team/agents/DEV_agent.md) |
-| Flutter Agent | [.agent_team/agents/Flutter_agent.md](.agent_team/agents/Flutter_agent.md) |
-| QA Agent | [.agent_team/agents/QA_agent.md](.agent_team/agents/QA_agent.md) |
-| DevOps Agent | [.agent_team/agents/DevOps_agent.md](.agent_team/agents/DevOps_agent.md) |
+| PO Agent | [agent_team/agents/Agent_01_PO.md](agent_team/agents/Agent_01_PO.md) |
+| TechLead Agent | [agent_team/agents/Agent_02_Architect.md](agent_team/agents/Agent_02_Architect.md) |
+| Designer Agent | [agent_team/agents/Agent_03_Designer.md](agent_team/agents/Agent_03_Designer.md) |
+| DEV Agent | [agent_team/agents/Agent_04_DEV.md](agent_team/agents/Agent_04_DEV.md) |
+| Flutter Agent | [agent_team/agents/Agent_05_Flutter.md](agent_team/agents/Agent_05_Flutter.md) |
+| QA Agent | [agent_team/agents/Agent_06_QA.md](agent_team/agents/Agent_06_QA.md) |
+| DevOps Agent | [agent_team/agents/Agent_07_DevOps.md](agent_team/agents/Agent_07_DevOps.md) |
 
-To add a new agent: create `.agent_team/agents/<NAME>_agent.md`, add a row to [.agent_team/agents_config.md](.agent_team/agents_config.md), and reference it in [_input/1_project_description.md](_input/1_project_description.md) §3.
+To add a new agent: create `agent_team/agents/<NAME>_agent.md`, add a row to [agent_team/agents_config.md](agent_team/agents_config.md), and reference it in [agent_team/workflow.md](agent_team/workflow.md) §1.
 
 ---
 
@@ -400,21 +400,22 @@ agentteam_demoproject/
 │   │   └── README.md
 │   ├── 4_design_input/               #   ← YOU DROP HERE: PDFs/images (Designer reads)
 │   │   └── README.md
-│   └── prompts/                      #   Paste these into Claude Code chat
+│   └── project_kickoff/                      #   Paste these into Claude Code chat
 │       ├── 1_scope.md                #     Step 4: refine rough idea
 │       ├── 2_kickoff.md              #     Step 5: start the build
 │       └── 3_change_request.md       #     Step 7: change after QA / deploy
 │
-├── .agent_team/                      # Framework internals (rarely edit)
+├── agent_team/                      # Framework internals (rarely edit)
+│   ├── workflow.md                   #   Agent roster + Process (phases) + N/A rule
 │   ├── agents_config.md              #   ← OPTIONAL: change which model each agent uses
 │   ├── agents/                       #   ← OPTIONAL: per-agent system prompts
-│   │   ├── PO_agent.md
-│   │   ├── Architect_agent.md
-│   │   ├── Designer_agent.md
-│   │   ├── DEV_agent.md
-│   │   ├── Flutter_agent.md
-│   │   ├── QA_agent.md
-│   │   └── DevOps_agent.md
+│   │   ├── Agent_01_PO.md
+│   │   ├── Agent_02_Architect.md
+│   │   ├── Agent_03_Designer.md
+│   │   ├── Agent_04_DEV.md
+│   │   ├── Agent_05_Flutter.md
+│   │   ├── Agent_06_QA.md
+│   │   └── Agent_07_DevOps.md
 │   └── task_board.md                 #   ← Auto-generated by Team Lead at kickoff
 │
 ├── CLAUDE.md                         # Team Lead instructions (auto-loaded by Claude Code)
@@ -423,11 +424,11 @@ agentteam_demoproject/
 ├── .env                              #   ← YOU CREATE: real secrets (gitignored, never commit)
 ├── .gitignore
 │
-├── docs/                             # Agent outputs (auto-generated)
+├── project_code/documentation/                             # Agent outputs (auto-generated)
 │   ├── .gitkeep
 │   ├── (user_stories.md)             #   Created by PO Agent
-│   ├── (api_contract.md)             #   Created by Architect Agent
-│   ├── (tech_design.md)              #   Created by Architect Agent (if non-trivial)
+│   ├── (api_contract.md)             #   Created by TechLead Agent
+│   ├── (tech_design.md)              #   Created by TechLead Agent (if non-trivial)
 │   ├── (design_spec.md)              #   Created by Designer Agent
 │   ├── (design_assets/)              #   Created by Designer Agent (Figma exports only)
 │   ├── (qa_report.md)                #   Created by QA Agent
@@ -458,7 +459,7 @@ agentteam_demoproject/
 └── README.md                         # This file
 ```
 
-> Files in `(parentheses)` are created by agents during execution. You must edit **`_input/1_project_description.md`** + **`_input/2_resources.md`** (copy from `_input/2_resources.example.md`) for every project, and **`.env` + `.mcp.json`** once per machine if you use Designer or DevOps agents.
+> Files in `(parentheses)` are created by agents during execution. You must edit **`project_setup/step_1_project.md`** + **`.env.md`** (copy from `.env.example.md`) for every project, and **`.env` + `.mcp.json`** once per machine if you use Designer or DevOps agents.
 
 ### 5.2 Adapt by tech stack
 
@@ -525,7 +526,7 @@ Spawn any new agent at any time during the project:
 ```
 Spawn a [AGENT NAME] to [TASK DESCRIPTION].
 Use model: [opus/sonnet/haiku].
-Read context from .agent_team/task_board.md and docs/.
+Read context from agent_team/task_board.md and project_code/documentation/.
 When done, update task_board.md.
 ```
 
@@ -567,8 +568,8 @@ Update task_board.md with the new phase.
 **Add a new feature (full cycle):**
 ```
 Add [FEATURE DESCRIPTION] to the existing project.
-1. PO Agent (model: opus): add new User Stories to docs/user_stories.md
-2. Architect Agent (model: opus): update docs/api_contract.md for the new endpoints
+1. PO Agent (model: opus): add new User Stories to project_code/documentation/user_stories.md
+2. TechLead Agent (model: opus): update project_code/documentation/api_contract.md for the new endpoints
 3. DEV Agent (model: sonnet): implement the feature, add tests
 4. QA Agent (model: sonnet): run all tests (regression + new), update report
 ```
@@ -605,11 +606,11 @@ The default flow uses one DEV Agent. For large projects (~50+ user stories or ge
 
 Each DEV owns a feature end-to-end: its routes, its models, its tests. Two DEVs never write to the same file.
 
-1. **At Phase 2**, ask Architect to add an *Implementation Plan* section to `docs/tech_design.md`:
+1. **At Phase 2**, ask Architect to add an *Implementation Plan* section to `project_code/documentation/tech_design.md`:
 
    ```
-   Architect Agent: in addition to the API contract, write an Implementation Plan in
-   docs/tech_design.md that splits work into N independent slices. For each slice list:
+   TechLead Agent: in addition to the API contract, write an Implementation Plan in
+   project_code/documentation/tech_design.md that splits work into N independent slices. For each slice list:
      - Slice name (e.g. "auth", "products")
      - User stories it covers (US-N references)
      - API endpoints it owns
@@ -620,10 +621,10 @@ Each DEV owns a feature end-to-end: its routes, its models, its tests. Two DEVs 
 2. **At Phase 3**, ask Team Lead to spawn one DEV per slice in parallel:
 
    ```
-   Spawn one DEV Agent (model: sonnet) per slice in docs/tech_design.md's Implementation Plan.
+   Spawn one DEV Agent (model: sonnet) per slice in project_code/documentation/tech_design.md's Implementation Plan.
    Run them in parallel. Each DEV gets:
      - Its slice name, user stories, endpoints, allowed file paths
-     - Read access to docs/ and to other slices' files (read-only)
+     - Read access to project_code/documentation/ and to other slices' files (read-only)
      - The full api_contract.md and design_spec.md
    Each DEV updates task_board.md with its slice ID when complete.
    ```
@@ -675,7 +676,7 @@ Run these 2 agents in parallel:
 2. UI/UX Agent (model: sonnet): analyze screenshots and prepare component specs
 
 When both complete, run these 2 in parallel:
-3. Architect Agent (model: opus): write API contract from user stories
+3. TechLead Agent (model: opus): write API contract from user stories
 4. DBA Agent (model: sonnet): design database schema + migrations
 
 After all 4 complete, spawn DEV Agent with their combined output.
@@ -712,7 +713,7 @@ Tech Stack:
 
 Agent Team:
 - PO Agent (model: opus): user stories
-- Architect Agent (model: opus): API contract + tech design
+- TechLead Agent (model: opus): API contract + tech design
 - DEV Agent (model: sonnet): fullstack code + tests
 - QA Agent (model: sonnet): API + E2E tests + security review
 ```
@@ -736,7 +737,7 @@ Tech Stack:
 
 Agent Team:
 - PO Agent (model: opus)
-- Architect Agent (model: opus)
+- TechLead Agent (model: opus)
 - DEV Agent (model: sonnet)
 - QA Agent (model: sonnet)
 ```
@@ -760,7 +761,7 @@ Tech Stack:
 
 Agent Team (adjusted):
 - PO Agent (model: opus): User Stories
-- Architect Agent (model: opus): API contract + DB schema
+- TechLead Agent (model: opus): API contract + DB schema
 - DEV Agent (model: sonnet): backend + admin panel + unit tests
 - QA Agent (model: sonnet): API tests + load tests
 ```
@@ -784,7 +785,7 @@ Tech Stack:
 
 Agent Team:
 - PO Agent (model: opus)
-- Architect Agent (model: opus)
+- TechLead Agent (model: opus)
 - DEV Agent (model: sonnet)
 - QA Agent (model: sonnet)
 - Security Agent (model: opus): auth flow review, rate limiting
@@ -809,7 +810,7 @@ Agent Team:
 
 | Tip | Details |
 |-----|---------|
-| **Communicate via files** | Always use `.agent_team/task_board.md` as the single source of truth |
+| **Communicate via files** | Always use `agent_team/task_board.md` as the single source of truth |
 | **Sequential phases** | Phase N output is Phase N+1 input — this ensures quality |
 | **Self-contained prompts** | Each agent prompt must include all context it needs |
 | **Screenshots for UI** | Paste Figma/design screenshots into chat for pixel-perfect UI |

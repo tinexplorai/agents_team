@@ -46,13 +46,12 @@ At the project root (not in this folder), copy `../.env.example` → `../.env` a
 **When:** `1_project_description.md` is still half-empty / you haven't picked a tech stack yet.
 **When to skip:** Step 1 is filled in carefully → go to Step 7.
 
-Start Claude Code (`claude` in this directory), then paste the contents of [`prompts/1_scope.md`](prompts/1_scope.md) into the chat. Fill in your rough idea between the `=== START ===` / `=== END ===` markers. PO + Architect will propose concrete values, ask questions, and update `1_project_description.md` after you answer.
 
 ### ☐ Step 7 — Kick off the build
-Start Claude Code, then paste the contents of [`prompts/2_kickoff.md`](prompts/2_kickoff.md) into the chat. Team Lead reads `1_project_description.md`, spawns the agent team, and runs the full pipeline through QA. After QA, it stops at the **deployment gate** and asks before pushing/deploying.
+Start Claude Code, then paste the contents of [`project_kickoff/1_prompt_kickoff.md`](project_kickoff/1_prompt_kickoff.md) into the chat. Team Lead reads `1_project_description.md`, spawns the agent team, and runs the full pipeline through QA. After QA, it stops at the **deployment gate** and asks before pushing/deploying.
 
 ### ☐ Step 8 — *(Later)* Change request after QA / deploy
-Paste [`prompts/3_change_request.md`](prompts/3_change_request.md) and fill in the `What / Where / Why / Severity / Constraints` form. Team Lead classifies the change (Small / Medium / Large-backend / Large-UX) and re-runs only the agents needed.
+Paste [`project_kickoff/2_prompt_change_request.md`](project_kickoff/2_prompt_change_request.md) and fill in the `What / Where / Why / Severity / Constraints` form. Team Lead classifies the change (Small / Medium / Large-backend / Large-UX) and re-runs only the agents needed.
 
 ---
 
@@ -66,7 +65,7 @@ _input/                         ← YOU EDIT FILES HERE
 ├── 2_resources.md              ← YOU CREATE (gitignored)
 ├── 3_po_input/                 ← drop PRDs / briefs (PO reads)
 ├── 4_design_input/             ← drop PDFs / images (Designer reads)
-└── prompts/                    ← paste these into Claude Code chat
+└── project_kickoff/                    ← paste these into Claude Code chat
     ├── 1_scope.md              ← Step 6: refine rough idea
     ├── 2_kickoff.md            ← Step 7: start the build
     └── 3_change_request.md     ← Step 8: change after QA / deploy
@@ -74,12 +73,13 @@ _input/                         ← YOU EDIT FILES HERE
 ../.env                         ← YOU CREATE (secrets, gitignored)
 ../.env.example                 ← template for ../.env
 
-../.agent_team/                 ← FRAMEWORK (rarely touch)
+../agent_team/                 ← FRAMEWORK (rarely touch)
+├── workflow.md                 ← agent roster + Process (phases) + N/A rule
 ├── agents_config.md            ← which model per agent (optional tweak)
 ├── agents/                     ← per-agent system prompts
 └── task_board.md               ← auto-created at kickoff
 
-../docs/                        ← AGENT OUTPUTS (auto-generated)
+../project_code/documentation/                        ← AGENT OUTPUTS (auto-generated)
 ├── user_stories.md             ← PO
 ├── api_contract.md             ← Architect
 ├── design_spec.md              ← Designer
@@ -101,4 +101,4 @@ _input/                         ← YOU EDIT FILES HERE
 | **`[PLACEHOLDER]`** | Not filled yet — agent asks you once, then writes the answer back. |
 | **`N/A`** | You explicitly defer — responsible agent decides and documents in their deliverable. |
 
-See [`1_project_description.md` §5.1](1_project_description.md) for the full N/A rule.
+See [`../agent_team/workflow.md` §3.1](../agent_team/workflow.md) for the full N/A rule.

@@ -3,9 +3,6 @@
 .env.local
 .env.*.local
 
-# Project resources (real values — copy from _input/2_resources.example.md)
-_input/2_resources.md
-
 # Node / JavaScript
 node_modules/
 dist/

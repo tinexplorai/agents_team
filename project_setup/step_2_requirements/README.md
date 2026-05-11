@@ -20,7 +20,7 @@ The PO Agent reads everything in this folder + [`_input/1_project_description.md
 ## Suggested file naming
 
 ```
-_input/3_po_input/
+project_setup/step_2_requirements/
 ├── 01_brief.md              # the original product brief
 ├── 02_customer_interviews.md
 ├── 03_competitor_analysis.pdf
@@ -33,6 +33,6 @@ Number-prefix optional, but it gives the agent a reading order if there's a natu
 
 1. Reads `_input/1_project_description.md` for the high-level "what + why".
 2. Reads everything in this folder for context, tone, evidence, and edge cases.
-3. Writes `docs/user_stories.md` — user stories with acceptance criteria, citing this folder where relevant.
+3. Writes `project_code/documentation/user_stories.md` — user stories with acceptance criteria, citing this folder where relevant.
 
 If this folder is empty, the agent writes user stories from `_input/1_project_description.md` alone.

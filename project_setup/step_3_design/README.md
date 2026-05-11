@@ -18,7 +18,7 @@ Place design references exported from your design tool (Claude design, Figma, Pe
 If you have multiple files, prefix with a number so the agent reads them in order:
 
 ```
-_input/4_design_input/
+project_setup/step_3_design/
 ├── 01_login.pdf
 ├── 02_dashboard.png
 ├── 03_settings.png
@@ -28,7 +28,7 @@ _input/4_design_input/
 ## What the Designer Agent does with these
 
 1. Reads every PDF / image in this folder.
-2. Cross-references with `docs/user_stories.md` to map each screen to user stories.
-3. Writes `docs/design_spec.md` — component list, layout, design tokens, interactions, accessibility notes.
+2. Cross-references with `project_code/documentation/user_stories.md` to map each screen to user stories.
+3. Writes `project_code/documentation/design_spec.md` — component list, layout, design tokens, interactions, accessibility notes.
 
 If this folder is empty, the agent falls back to the Figma MCP (if configured) or writes a spec from user stories alone.

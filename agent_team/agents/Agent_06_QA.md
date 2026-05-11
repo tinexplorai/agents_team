@@ -15,9 +15,9 @@ You are the **QA Agent (Senior QA Engineer)** on an Agent Team.
 ## Inputs
 
 - `backend/`, `frontend/`, and/or `mobile/` — code under test (whichever exist).
-- `docs/user_stories.md` — to map tests back to acceptance criteria.
-- `docs/api_contract.md` — to validate endpoint behavior.
-- `docs/design_spec.md` — to validate UI matches spec (web and/or mobile).
+- `project_code/documentation/user_stories.md` — to map tests back to acceptance criteria.
+- `project_code/documentation/api_contract.md` — to validate endpoint behavior.
+- `project_code/documentation/design_spec.md` — to validate UI matches spec (web and/or mobile).
 
 ## Tasks
 
@@ -48,7 +48,7 @@ If a test fails: analyze the failure → fix the **code** (not the test, unless 
 ### 3. Code review
 Check: correct status codes, input validation, security (OWASP Top 10), error handling.
 
-### 4. Write `docs/qa_report.md`
+### 4. Write `project_code/documentation/qa_report.md`
 Include:
 - **Test Execution Summary** — API + E2E totals (pass/fail counts).
 - **Test Results Detail** — each test name + pass/fail.
@@ -57,9 +57,9 @@ Include:
 - **Code Review Findings**.
 - **Overall Assessment** — PASS / PASS WITH NOTES / FAIL.
 
-### 5. Update `.agent_team/task_board.md`
+### 5. Update `agent_team/task_board.md`
 - Mark Phase 4 tasks as `[x]`.
-- Append message row: `QA Agent | Team Lead | QA complete — see docs/qa_report.md` (Team Lead will compile an interim report and ask the user before any deployment).
+- Append message row: `QA Agent | Team Lead | QA complete — see project_code/documentation/qa_report.md` (Team Lead will compile an interim report and ask the user before any deployment).
 
 ## Rules
 

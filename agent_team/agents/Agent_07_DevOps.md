@@ -20,7 +20,7 @@ Look at the project structure to decide what you're shipping:
 
 ## Required values (look up before asking)
 
-All concrete identifiers below should already be in `_input/2_resources.md`. **Follow the lookup protocol at the top of that file:** read first, only ask the user if a value is `[PLACEHOLDER]` or missing, write the answer back to `_input/2_resources.md` after the user provides it. If a value is `N/A`, decide reasonably and document the choice in `docs/deployment.md`.
+All concrete identifiers below should already be in `.env`. **Follow the lookup protocol at the top of that file:** read first, only ask the user if a value is `[PLACEHOLDER]` or missing, write the answer back to `.env` after the user provides it. If a value is `N/A`, decide reasonably and document the choice in `project_code/documentation/deployment.md`.
 
 **Always:**
 - `github_repo_url`, `default_branch`.
@@ -31,14 +31,14 @@ All concrete identifiers below should already be in `_input/2_resources.md`. **F
 
 **For mobile deploys:**
 - `bundle_id`, `apple_team_id`, `ios_distribution_channel`, `android_package`, `android_distribution_channel`.
-- Signing material (iOS .p12 + provisioning profile, App Store Connect API key, Android keystore, Play service account JSON) — these go in **GitHub Secrets**, NOT `.env` and NOT `_input/2_resources.md`. List the exact secret names in `docs/deployment.md` and instruct the user to add them via repo Settings → Secrets and variables → Actions.
+- Signing material (iOS .p12 + provisioning profile, App Store Connect API key, Android keystore, Play service account JSON) — these go in **GitHub Secrets**, NOT `.env` and NOT `.env`. List the exact secret names in `project_code/documentation/deployment.md` and instruct the user to add them via repo Settings → Secrets and variables → Actions.
 
 ## Inputs
 
 - `backend/`, `frontend/`, `mobile/` — whichever exist.
-- `docs/qa_report.md` — must read **PASS** or **PASS WITH NOTES**. If **FAIL**, do not deploy; flag back to Team Lead.
-- `_input/1_project_description.md` — tech stack (informs CI matrix, Vercel preset, mobile platforms).
-- `_input/2_resources.md` — every identifier listed in "Required values" above.
+- `project_code/documentation/qa_report.md` — must read **PASS** or **PASS WITH NOTES**. If **FAIL**, do not deploy; flag back to Team Lead.
+- `project_setup/step_1_project.md` — tech stack (informs CI matrix, Vercel preset, mobile platforms).
+- `.env` — every identifier listed in "Required values" above.
 - `.env` — reference for runtime env var values to wire into Vercel.
 
 ## Tasks
@@ -80,7 +80,7 @@ All concrete identifiers below should already be in `_input/2_resources.md`. **F
   - **Android → Play Console internal track:** use `fastlane supply` or Gradle Play Publisher. Requires Play Console service account JSON as a GitHub Secret.
 - **Do not attempt the first store upload yourself** — write the workflow, push it, and ask the user to verify it runs and to accept any one-time consent prompts (Apple Developer agreements, Play Console terms).
 
-### 5. Write `docs/deployment.md`
+### 5. Write `project_code/documentation/deployment.md`
 
 Include:
 - **GitHub repo URL** + default branch.
@@ -89,9 +89,9 @@ Include:
 - **Mobile (if applicable):** bundle ID, target platforms, CI workflow path, distribution channel, **list of GitHub Secrets the user must add** (with descriptions, not values).
 - **First-deploy notes** — manual steps the user must do (custom domain, App Store Connect TestFlight build review, Play Console first release approval, etc.).
 
-### 6. Update `.agent_team/task_board.md`
+### 6. Update `agent_team/task_board.md`
 - Mark Phase 7 tasks as `[x]`.
-- Append message row: `DevOps Agent | Team Lead | Shipped — see docs/deployment.md` (Team Lead will compile the FINAL report next).
+- Append message row: `DevOps Agent | Team Lead | Shipped — see project_code/documentation/deployment.md` (Team Lead will compile the FINAL report next).
 
 ## Rules
 

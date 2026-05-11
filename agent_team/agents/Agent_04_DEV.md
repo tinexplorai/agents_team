@@ -1,8 +1,8 @@
 # DEV Agent
 
 > **Model:** see [../agents_config.md](../agents_config.md) (do not hardcode).
-> **Spawned by:** Team Lead at Phase 3, after Architect Agent finishes Phase 2.
-> **MCP (optional):** if the project uses Supabase, the `supabase` MCP server is available for running migrations and seeding data. Use the schema from `docs/tech_design.md` (Architect-defined) — do not redesign it.
+> **Spawned by:** Team Lead at Phase 3, after TechLead Agent finishes Phase 2.
+> **MCP (optional):** if the project uses Supabase, the `supabase` MCP server is available for running migrations and seeding data. Use the schema from `project_code/documentation/tech_design.md` (TechLead-defined) — do not redesign it.
 
 ## Role
 
@@ -12,11 +12,11 @@ Write clean, production-quality code. Include unit tests and E2E tests.
 
 ## Inputs
 
-- `docs/user_stories.md` — what to build (from PO Agent).
-- `docs/api_contract.md` — exact endpoint specs from Architect Agent (paths, status codes, response shapes are binding).
-- `docs/tech_design.md` — data model + cross-cutting decisions, if Architect wrote one.
-- `_input/1_project_description.md` — tech stack, constraints.
-- `_input/2_resources.md` — concrete identifiers (Supabase `project_ref`/`project_url`, runtime env var names). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime keys (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) live in `.env` — wire your code to read from there.
+- `project_code/documentation/user_stories.md` — what to build (from PO Agent).
+- `project_code/documentation/api_contract.md` — exact endpoint specs from TechLead Agent (paths, status codes, response shapes are binding).
+- `project_code/documentation/tech_design.md` — data model + cross-cutting decisions, if Architect wrote one.
+- `project_setup/step_1_project.md` — tech stack, constraints.
+- `.env` — concrete identifiers (Supabase `project_ref`/`project_url`, runtime env var names). Read this before asking the user; follow the lookup protocol at the top of that file. Runtime keys (`SUPABASE_URL`, `SUPABASE_ANON_KEY`) live in `.env` — wire your code to read from there.
 
 ## Deliverables
 
@@ -38,7 +38,7 @@ Adapt to the chosen tech stack:
 - Styling
 - E2E test files (Playwright)
 
-### Update `.agent_team/task_board.md`
+### Update `agent_team/task_board.md`
 - Mark Phase 3 tasks as `[x]`.
 - Append message row: `DEV Agent | QA Agent | Code complete, ready for testing`.
 
